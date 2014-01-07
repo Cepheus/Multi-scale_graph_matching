@@ -1,7 +1,7 @@
 \documentclass[UTF8, twoside]{EPURapport}
 \input{include.tex}
 
-\thedocument{Pattern recognition project draft}{Multi-scale graph comparision}{Multi-scale graph comparision}
+\thedocument{Pattern recognition project draft}{Multi-scale graph comparison}{Multi-scale graph comparison}
 
 \grade{Computer Aided Decision Support\\ International Research Master 2\\ 2013 - 2014}
 
@@ -26,9 +26,9 @@
 
 \chapter{Formalization of the problem}
 
-	\hspace{4ex}When we wish to do the comparaison of two graphs, we can come to a limitation when handling high sized graphs. The community detection algorithms allow to simplify a graph by finding communities of highly related nodes. It is then legitimate to want to use such algorithm to reduce the size of graphs in order to perform calculations that are greedy for computation time.
+	\hspace{4ex}When we wish to do the comparison of two graphs, we can come to a limitation when handling high sized graphs. The community detection algorithms allow to simplify a graph by finding communities of highly related nodes. It is then legitimate to want to use such algorithm to reduce the size of graphs in order to perform calculations that are greedy for computation time.
 	
-	For this project we choose to use a community detection algorithm for graph comparision. The Louvain's method is very fast and easy to implement. The graph edit distance method is known to be very slow when dealing with high scaled graphs. In this project we want to use the community detection to simplify the graphs to be used in the graph edit distance so we can still compare them with a good computation time.
+	For this project we choose to use a community detection algorithm for graph comparison. The Louvain's method is very fast and easy to implement. The graph edit distance method is known to be very slow when dealing with high scaled graphs. In this project we want to use the community detection to simplify the graphs to be used in the graph edit distance so we can still compare them with a good computation time.
 	
 	There is still an issue to solve, how do we use one method with the other. The Louvain's method can be used in several iterations to make the graph more and more simple. We must find a relation between the edit distance between two graphs at different scales and the edit distance between the unchanged graphs. At which scale do we decide that the edit distance is close enough to our original graph? Can we use the different scales together in order to be closer to the distance between the origal graphs? These questions are at the center of our problem.
 	
@@ -100,8 +100,12 @@ Q = \frac{1}{2m}\underset{i,j}{\sum}\left[A_{ij} - \frac{k_ik_j}{2m}\right] \del
 \end{algorithm}
 
 \chapter{Multi-scale graph comparision}
-
-	\textit{Explain here how we choosed to use both methods together in order to do multi-scale comparision.}	
 	
+	\hspace{4ex}We want to compare two graphs G1 and G2. We first use the Louvain's method on G1 until the graph isn't simplified (it is a unique node), we have stored the communities at each scale of the nodes. We then apply the GED algorithm between the most simplified version of G1 and G2, only when we will evaluate the cost of deletion/substitution of a community (i.e. a node that isn't a node in the original graph G1) we will use the GED of the subgraph of this community and G2.
+	
+	In other words, the algorithm will compare every community (which are sub-graphs) with G2. We hope that this approach will reduce the computation time of the total distance. 
+\\
+
+	The algorithm is the same as the Graph Edit Distance, this only difference is the cost function which is $GED(GetSubGraph(c),G2)$ where $c$ is a community and the function $GetSubGraph(c)$ returns the sub-graph of the community c. 
 	
 \end{document}
