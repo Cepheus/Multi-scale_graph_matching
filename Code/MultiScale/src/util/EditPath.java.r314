@@ -1,0 +1,943 @@
+package util;
+
+import java.io.PrintStream;
+import java.util.*;
+
+import algorithms.Constants;
+import algorithms.MunkresRec;
+
+
+/**
+ * @author Romain Raveaux
+ * 
+ */
+public class EditPath implements Comparable {
+
+	/**
+	 * the total costs of this path
+	 */
+	private double totalCosts;
+	
+	private double HeuristicCosts;
+	
+	private int noOfDistortedNodes;
+	
+	private String editPathId;
+	
+
+	public double getHeuristicCosts() {
+		return HeuristicCosts;
+	}
+
+	public int getNoOfDistortedNodes()
+	{
+		return noOfDistortedNodes;
+	}
+	
+	public void setID(String editPathId)
+	{
+		this.editPathId = editPathId;
+	}
+	
+	public String getID()
+	{
+		return editPathId;
+	}
+	
+	public void setNoOfDistortedNodes(int noOfDistortedNodes)
+	{
+		this.noOfDistortedNodes = noOfDistortedNodes;
+	}
+	
+	public void setHeuristicCosts(double heuristicCosts) {
+		HeuristicCosts = heuristicCosts;
+	}
+	
+	public double ComputeHeuristicCosts() {
+		HeuristicCosts=0.0;
+		int n1,n2;
+		int e1,e2;
+		n1 = this.unUsedNodes1.size();
+		n2 = this.unUsedNodes2.size();
+		
+		e1 = this.unUsedEdges1.size();
+		e2 = this.unUsedEdges2.size();
+		//System.out.println("********************************************");
+		
+//		double leastexpensivenodesub = ComputeMinSubstituion(unUsedNodes1,unUsedNodes2);
+//		HeuristicCosts = leastexpensivenodesub;
+//		
+//		double leastexpensiveedgesub = ComputeMinSubstituion(unUsedEdges1,unUsedEdges2);
+//		HeuristicCosts += leastexpensiveedgesub;
+//		
+		int nbdeletions=Math.max(0, n1-n2);
+		HeuristicCosts += ComputeNbDeletion(unUsedNodes1,nbdeletions);
+		int nbinsertion=Math.max(0,n2-n1);
+		HeuristicCosts += ComputeNbInsertion(unUsedNodes2,nbinsertion);
+		
+		nbdeletions=Math.max(0, e1-e2);
+		HeuristicCosts += ComputeNbDeletion(unUsedEdges1,nbdeletions);
+		nbinsertion=Math.max(0,e2-e1);
+		HeuristicCosts += ComputeNbInsertion(unUsedEdges2,nbinsertion);
+		
+		
+		/*HeuristicCosts+=(Math.max(0, n1-n2)*alpha);
+		HeuristicCosts+=(Math.max(0,n2-n1)*alpha);
+		HeuristicCosts+=(Math.max(0, e1-e2)*(1-alpha));
+		HeuristicCosts+=(Math.max(0,e2-e1)*(1-alpha));
+		*/
+	
+		
+			
+		
+		//HeuristicCosts = (Math.min(n1,n2)*alpha);
+		//System.out.println("min (n1,n2) = min("+n1+","+n2+") = "+ HeuristicCosts);
+		//HeuristicCosts+=(Math.min(e1,e2)*(1-alpha));
+		//System.out.println("min (e1,e2) = min("+e1+","+e2+") = "+ Math.min(e1,e2));
+		
+			
+		
+		
+	/*	System.out.println("max (0,n1-n2) = max(0,"+(n1-n2)+") = "+ Math.max(0, n1-n2));
+		System.out.println("max (0,n2-n1) = max(0,"+(n2-n1)+") = "+Math.max(0,n2-n1));
+		
+		
+	
+		
+		System.out.println("max (0,e1-e2) = max(0,"+(e1-e2)+") = "+Math.max(0, e1-e2));
+		System.out.println("max (0,e2-e1) = max(0,"+(e2-e1)+") = "+Math.max(0,e2-e1));
+		
+		System.out.println("Total Heuristic Cost  :  "+ HeuristicCosts);
+		System.out.println("********************************************");*/
+		
+		return HeuristicCosts;
+	}
+
+	private double ComputeNbDeletion(LinkedList unUsedNodes12, int nbdeletions) {
+		// TODO Auto-generated method stub
+		 GraphComponent node2 = new GraphComponent(Constants.EPS_ID) ;
+		 double res=0.0;
+		 
+		 for(int i=0;i<nbdeletions;i++){
+			 GraphComponent node1 = (GraphComponent) unUsedNodes12.get(i);
+			 res+=Constants.costFunction.getCosts(node1, node2);
+		 }
+		return res;
+	}
+	
+	private double ComputeNbInsertion(LinkedList unUsedNodes12, int nbdeletions) {
+		// TODO Auto-generated method stub
+		 GraphComponent node2 = new GraphComponent(Constants.EPS_ID) ;
+		 double res=0.0;
+		 
+		 for(int i=0;i<nbdeletions;i++){
+			 GraphComponent node1 = (GraphComponent) unUsedNodes12.get(i);
+			 res+=Constants.costFunction.getCosts(node2,node1 );
+		 }
+		return res;
+	}
+
+	private double ComputeMinSubstituion(LinkedList unUsedNodes12,
+			LinkedList unUsedNodes22) {
+		// TODO Auto-generated method stub
+		 MunkresRec munkresRec; 
+		 munkresRec = new MunkresRec();
+		 int n = Math.max(unUsedNodes12.size(), unUsedNodes22.size());
+		 double[][] matrix = new double[n][n];
+		 for (int i = 0; i < n; i++){
+			 GraphComponent node1 = new GraphComponent(Constants.EPS_ID) ;
+			 if(i<unUsedNodes12.size()){
+				  node1 = (GraphComponent)unUsedNodes12.get(i);
+				
+			 }
+			 
+			 for (int j = 0; j < n; j++){
+				 GraphComponent node2 = new GraphComponent(Constants.EPS_ID) ;
+				 if(j<unUsedNodes22.size()){
+					  node2 = (GraphComponent)unUsedNodes22.get(j);
+					
+				 }
+				 if(node1.getId() == Constants.EPS_ID || 
+						 node2.getId() == Constants.EPS_ID	 ){
+					 matrix[i][j]=0;
+				 }else{
+				     matrix[i][j]=Constants.costFunction.getCosts(node1, node2);
+				 }
+			 }
+			 
+		 }
+		return munkresRec.getCosts(matrix);
+	}
+
+	/**
+	 * the unused nodes of both graphs
+	 */
+	private LinkedList unUsedNodes1, unUsedNodes2;
+
+	/**
+	 * the unused edges of both grpahs
+	 */
+	private LinkedList unUsedEdges1, unUsedEdges2;
+
+	/**
+	 * saves all distortions key = source graph-component value = target
+	 * graph-component
+	 */
+	private Hashtable distortions;
+	
+	private Hashtable EdgeInverted;
+	public Hashtable getEdgeInverted() {
+		return EdgeInverted;
+	}
+
+	public void setEdgeInverted(Hashtable edgeInverted) {
+		EdgeInverted = edgeInverted;
+	}
+
+	private Graph source, target;
+
+	/**
+	 * constructs a new editpath between
+	 * 
+	 * @param source
+	 *            and
+	 * @param target
+	 */
+	public EditPath(Graph source, Graph target) {
+		this.init();
+		this.source = source;
+		this.target = target;
+		this.unUsedNodes1.addAll(source);
+		this.unUsedNodes2.addAll(target);
+		this.unUsedEdges1.addAll(source.getEdges());
+		this.unUsedEdges2.addAll(target.getEdges());
+	}
+
+	
+	/**
+	 * constructs a new editpath from a string str
+	 *  @param String Format: (HeuristicCosts<>totalCosts<>getId1<>getId2<>getEdgesId1<>
+	 *  getEdgesId2<>getEdgesMode1<>getEdgesMode2<>unUsedNodes1<>
+	 *  unUsedNodes2<>unUsedEdges1<>unUsedEdges2<>Distortions<>invertedEdges)
+		
+	 */
+	
+	public EditPath(String str) { 
+		init(); // initializing the edit path
+		this.source = new Graph();
+		this.target = new Graph();
+		
+		String[] parts = str.split("<>"); // splitting the string into 14 parts
+		//14 parts
+		/* 0:HeuristicCost
+		 * 1:totalCost
+		 * 2:getId1
+		 * 3:getId2
+		 * 4:getEdgesId1
+		 * 5:getEdgesId2
+		 * 6:getEdgesMode1
+		 * 7:getEdgesMode2
+		 * 8:unUsedNodes1
+		 * 9:unUsedNodes2
+		 * 10:unUsedEdges1
+		 * 11:unUsedEdges2
+		 * 12:Distortions
+		 * 13:invertedEdges
+		 * */
+		/*		System.out.println("Length: "+parts.length);
+	     for(int i=0; i<parts.length ; i++)
+		 {
+			 System.out.println("parts("+i+") = "+parts[i]);
+		 }
+	 */
+		//parsing both heuristic and total costs
+		HeuristicCosts = Double.parseDouble(parts[0]);
+		totalCosts=Double.parseDouble(parts[1]);
+		
+		//parsing graph1's ID
+		if(parts[2].length()!=0)
+			this.source.setId(parts[2]);
+		//parsing graph2's ID
+		if(parts[3].length()!=0)
+			this.target.setId(parts[3]);
+		//parsing edgesID of graph1
+		if(parts[4].length()!=0)
+			this.source.setEdgeId(parts[4]);
+		//parsing edgesID of graph2
+		if(parts[5].length()!=0)
+			this.target.setEdgeId(parts[5]);
+		//parsing setEdgeMode of graph1
+		if(parts[6].length()!=0)
+			this.source.setEdgeMode(parts[6]);
+		//parsing setEdgeMode of graph2
+		if(parts[7].length()!=0)
+			this.target.setEdgeMode(parts[7]);
+		if(parts[8].length()!=0)
+		{
+			this.noOfDistortedNodes = Integer.parseInt(parts[8]);
+		}
+		//Parsing unUsedNodes1
+		//System.out.println("---------------unUsedNodes1");
+		if(parts[9].length()!=0)
+		{
+			nodeListParser(this,source,unUsedNodes1,parts[9],parts[6]);
+
+		}
+		
+		//Parsing unUsedNodes2
+		//System.out.println("-------------unUsedNodes2");
+		if(parts[10].length()!=0)
+		{
+			nodeListParser(this,target,unUsedNodes2,parts[10],parts[7]);
+		}
+		
+		
+		//Parsing unUsedEdges1
+		//System.out.println("------unUsedEdges1");
+		if(parts[11].length()!=0)
+		{
+			edgeListParser(this,source,unUsedEdges1,parts[11],parts[6]);
+		 
+		}
+				
+		//Parsing unUsedEdges2
+		//System.out.println("-------unUsedEdges2**");
+		if(parts[12].length()!=0)
+		{
+			edgeListParser(this,target,unUsedEdges2,parts[12],parts[7]);
+		
+		}
+		
+		 /*Parsing Distortions
+		 * 	Distortions:  <distortion1/distortion2/distortion3/.........etc>
+		 * distortion(i): distortionType%1st part>>2nd part
+		 * distortionType: Node or Edge
+		 */
+			
+		//System.out.println("----------Distortions**");
+		if(parts[13].length()!=0)
+		{
+			String[] getDistortions = parts[13].split("/");
+			for(int i=0 ; i<getDistortions.length ; i++)
+			{
+				String[] DistortionType = getDistortions[i].split("%");
+				
+				// if the distortion is node to node
+				if(DistortionType[0].equals("Node"))
+				{
+			//		System.out.println("Node Distortion ............");
+					String[] nodes12 = DistortionType[1].split(">>");
+					
+					//testing whether sourceNode, targetNode or non of them is  eps
+		            if(nodes12[0].equals("eps_id"))
+		            {
+		            	GraphComponent eps = new GraphComponent(Constants.EPS_ID);
+		            	Node nd2 = new Node(nodes12[1],parts[7],true,target);
+						//target.add(nd2);
+		      //      	System.out.println("Node Distortion (eps,"+nd2.getId()+")");
+						distortions.put(eps, nd2);
+		            }
+		            else if(nodes12[1].equals("eps_id"))
+		            {
+		            	Node nd1 = new Node(nodes12[0],parts[6],true,source);
+						//source.add(nd1);
+		            	GraphComponent eps = new GraphComponent(Constants.EPS_ID);
+		        //    	System.out.println("Node Distortion ("+nd1.getId()+",eps)");
+		            	distortions.put(nd1, eps);
+		            }
+		            else
+		            {
+		            	//System.out.println("neither nd1 nor nd2 is eps*************");
+		            	Node nd1 = new Node(nodes12[0],parts[6],true,source);
+						//source.add(nd1);
+						Node nd2 = new Node(nodes12[1],parts[7],true,target);
+						//target.add(nd2);
+					//	System.out.println("Node Distortion ("+nd1.getId()+","+nd2.getId()+")");
+						distortions.put(nd1, nd2);
+							
+		            }
+					
+		           ///////////////////////////////////////////		
+				}
+			
+				// if the distortion is edge to edge
+				else if(DistortionType[0].equals("Edge"))
+				{
+					//System.out.println("Edge Distortion ............");
+					String[] edges12 = DistortionType[1].split(">>");
+						
+					//testing whether sourceNode, targetNode or non of them is eps 
+					 if(edges12[0].equals("eps_id"))
+			            {
+			            	GraphComponent eps = new GraphComponent(Constants.EPS_ID);
+			        		Edge edg2 = new Edge(edges12[1],parts[7],target);
+							target.getEdges().add(edg2);
+						//	System.out.println("Edge Distortion (eps,"+edg2.getId()+")");
+							distortions.put(eps, edg2);
+			            }
+			            else if(edges12[1].equals("eps_id"))
+			            {
+			            	Edge edg1 = new Edge(edges12[0],parts[6],source);
+							source.getEdges().add(edg1);
+							GraphComponent eps = new GraphComponent(Constants.EPS_ID);
+							//System.out.println("Edge Distortion ("+edg1.getId()+",eps)");
+							distortions.put(edg1, eps);
+			            }
+			            else
+			            {
+  	
+			         		Edge edg1 = new Edge(edges12[0],parts[6],source);
+							source.getEdges().add(edg1);
+							Edge edg2 = new Edge(edges12[1],parts[7],target);
+							target.getEdges().add(edg2);
+						//	System.out.println("Edge Distortion ("+edg1.getId()+","+edg2.getId()+")");
+							distortions.put(edg1, edg2);	
+			            }
+				
+				}
+					
+		     }
+		}
+		
+		
+		//Parsing invertedEdges
+		
+		/*
+		 *invertedEdges Format: <invertedEdge1/invertedEdge2/ ...... >
+		 *invertedEdges(i): edge=true or edge=false
+		 */
+		if(parts.length==15)
+		{
+			if(parts[14].length()!=0)
+			{
+				
+				if(parts[13].toString().equals("\t")!=true)
+				{
+					String[] getInvertedEdges = parts[13].split("/");
+					for(int i=0; i<getInvertedEdges.length ; i++)
+					{
+						String[] invertedEdge = getInvertedEdges[i].split("=");
+						Edge edg = new Edge(invertedEdge[0],parts[6],source);
+						boolean isInverted =Boolean.parseBoolean(invertedEdge[1]) ;
+						EdgeInverted.put((GraphComponent)edg, isInverted);
+
+					}	
+						
+				}
+			
+
+			
+			}
+
+		}
+		
+		
+	/*	System.out.println("**************Source*************************");
+		
+		Iterator nodeIterator = source.iterator();
+		while (nodeIterator.hasNext()) {
+			Node node = (Node) nodeIterator.next();
+			System.out.println("**********************");
+			System.out.println("Node:"+node.getId());
+			for(int i=0; i<node.getEdges().size(); i++)
+			{
+			  System.out.println("Edge"+node.getEdges().get(i));
+				
+			}
+			System.out.println("**********************");
+			
+		}
+		
+		System.out.println("**************Target*************************");
+		
+		Iterator nodeIterator2 = target.iterator();
+		while (nodeIterator2.hasNext()) {
+			Node node = (Node) nodeIterator2.next();
+			System.out.println("**********************");
+			System.out.println("Node:"+node.getId());
+			for(int i=0; i<node.getEdges().size(); i++)
+			{
+			  System.out.println("Edge"+node.getEdges().get(i));
+				
+			}
+			System.out.println("**********************");
+			
+		}
+		System.out.println("**********************");
+		System.out.println("Edges in Graph source");
+		
+		Iterator nodeIterator3 = source.getEdges().iterator();
+		while (nodeIterator3.hasNext()) {
+			Edge edge = (Edge) nodeIterator3.next();
+			System.out.println("**Edge: "+edge.getId());
+			System.out.println("Start node: "+edge.getStartNode().getId());
+			System.out.println("End node: "+edge.getEndNode().getId());
+			
+		}
+		
+		System.out.println("**********************");
+		System.out.println("Edges in Graph target");
+		
+		Iterator nodeIterator4 = target.getEdges().iterator();
+		while (nodeIterator4.hasNext()) {
+			Edge edge = (Edge) nodeIterator4.next();
+			System.out.println("**Edge: "+edge.getId());
+			System.out.println("Start node: "+edge.getStartNode().getId());
+			System.out.println("End node: "+edge.getEndNode().getId());
+		}
+		*/
+	}
+	
+	/**
+	 * parsing the edge list
+	 *
+	 */
+	private void edgeListParser(EditPath editPath, Graph graph,
+			LinkedList unUsedEdges, String edgeListString, String edgeMode) {
+		// TODO Auto-generated method stub
+		
+		String[] getUnUsedEdges = edgeListString.split("/");
+		for(int i=0; i<getUnUsedEdges.length ; i++)
+		{
+			Edge edg = new Edge(getUnUsedEdges[i],edgeMode, graph);
+			unUsedEdges.add(edg);
+			graph.getEdges().add(edg);
+		}
+		
+	}
+
+	/**
+	 * parsing the node list
+	 *
+	 */
+	private void nodeListParser(EditPath editPath, Graph graph, LinkedList unUsedNodes,
+			String nodeListString, String edgeMode) {
+		
+		String[] getUnUsedNodes = nodeListString.split("/");
+		for(int i=0; i<getUnUsedNodes.length ; i++)
+		{
+			
+			Node nd = new Node(getUnUsedNodes[i],edgeMode,false,graph); // the node has not existed before
+			unUsedNodes.add((GraphComponent)nd);
+			graph.add(nd);
+
+		}
+
+		
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * copy constructor for an existing edit path
+	 * 
+	 * @param e
+	 */
+	public EditPath(EditPath e) {
+		this.init();
+		this.source = e.getSource();
+		this.target = e.getTarget();
+		this.unUsedNodes1.addAll(e.getUnUsedNodes1());
+		this.unUsedNodes2.addAll(e.getUnUsedNodes2());
+		this.unUsedEdges1.addAll(e.getUnUsedEdges1());
+		this.unUsedEdges2.addAll(e.getUnUsedEdges2());
+		this.totalCosts = e.getTotalCosts();
+		this.distortions.putAll(e.getDistortions());
+		this.EdgeInverted.putAll(e.getEdgeInverted());
+		this.noOfDistortedNodes=e.getNoOfDistortedNodes();
+	}
+
+	/**
+	 * helper method for both constructors
+	 */
+	private void init() {
+		this.unUsedEdges1 = new LinkedList();
+		this.unUsedEdges2 = new LinkedList();
+		this.unUsedNodes1 = new LinkedList();
+		this.unUsedNodes2 = new LinkedList();
+		this.distortions = new Hashtable();
+		EdgeInverted = new Hashtable();
+		this.totalCosts = 0.0;
+		this.noOfDistortedNodes=0;
+		HeuristicCosts=0.0;
+	}
+
+	/**
+	 * adds a new distortion to this path
+	 * 
+	 * @param sComp
+	 * @param tComp
+	 */
+	public void addDistortion(GraphComponent sComp, GraphComponent tComp) {
+		this.totalCosts += Constants.costFunction.getCosts(sComp, tComp);
+		if (sComp.getComponentId().equals(Constants.EPS_ID)) {
+			GraphComponent eps = new GraphComponent(Constants.EPS_ID);
+			//System.out.println("****DISTORTION : ("+eps.getComponentId()+" , "+tComp.getComponentId()+")");
+			this.distortions.put(eps, tComp);
+		} else {
+			//System.out.println("****DISTORTION : ("+sComp.getComponentId()+" , "+tComp.getComponentId()+")");
+			this.distortions.put(sComp, tComp);
+		}
+		
+		if (sComp.isNode() || tComp.isNode()) {
+			this.noOfDistortedNodes++;
+			this.unUsedNodes1.remove(sComp);
+			// edgehandling (only once and only if comp=node!)
+			//System.out.println("handling edges between "+sComp);
+			Constants.edgeHandler.handleEdges(this, sComp, tComp);
+		} else {
+			this.unUsedEdges1.remove(sComp);
+		}
+		if (tComp.isNode()) {
+			this.unUsedNodes2.remove(tComp);
+		} else {
+			this.unUsedEdges2.remove(tComp);
+		}
+		
+		if (   sComp.getComponentId().equals(Constants.EPS_ID) == false &&  tComp.getComponentId().equals(Constants.EPS_ID) == false && 
+				sComp.isNode()==false && tComp.isNode()==false && ((Edge)sComp) .isDirected()  ==true) {
+			EdgeInverted.put(sComp, ((Edge)sComp).isInverted());
+		}
+	}
+
+	/**
+	 * @return true if this path is complete
+	 */
+	public boolean isComplete() {
+		int remaining = this.unUsedNodes1.size();
+		remaining += this.unUsedNodes2.size();
+		return (remaining == 0);
+	}
+
+	/**
+	 * @return true if this path has not used all start nodes yet
+	 */
+	public boolean hasStartNodes() {
+		return (this.unUsedNodes1.size() > 0);
+	}
+
+	/**
+	 * @return the total costs of this path
+	 */
+	public double getTotalCosts() {
+		return totalCosts;
+	}
+
+	/**
+	 * getters for the unused graphcomponents of this path
+	 */
+	public LinkedList getUnUsedNodes1() {
+		return unUsedNodes1;
+	}
+
+	public LinkedList getUnUsedNodes2() {
+		return unUsedNodes2;
+	}
+
+	public LinkedList getUnUsedEdges1() {
+		return unUsedEdges1;
+	}
+
+	public LinkedList getUnUsedEdges2() {
+		return unUsedEdges2;
+	}
+
+	/**
+	 * @return the next node of source graph
+	 */
+	public Node getNext() {
+		return (Node) this.unUsedNodes1.getFirst();
+	}
+
+	public Node getNextG2() {
+		return (Node) this.unUsedNodes2.getFirst();
+	}
+	
+	/**
+	 * completes the actual path by inserting the remaining nodes of target
+	 */
+	public void complete() {
+		LinkedList tempList = new LinkedList();
+		tempList.addAll(this.unUsedNodes2);
+		Iterator iter = tempList.iterator();
+		while (iter.hasNext()) {
+			Node w = (Node) iter.next();
+			this.addDistortion(Constants.EPS_COMPONENT, w);
+		}
+	}
+
+	/**
+	 * @return the mappings
+	 */
+	public Hashtable getDistortions() {
+		return distortions;
+	}
+
+	/**
+	 * @return the origin of
+	 * @param mapped
+	 */
+	public GraphComponent getStart(GraphComponent mapped) {
+		Enumeration enumeration = this.distortions.keys();
+		while (enumeration.hasMoreElements()) {
+			GraphComponent key = (GraphComponent) enumeration.nextElement();
+			GraphComponent value = (GraphComponent) this.distortions.get(key);
+			if (value.equals(mapped)) {
+				return key;
+			}
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * helper method for debuging: prints the path in the std. output
+	 */
+	public void printMe() {
+		System.out.println("source-label: "+this.source.getId());
+		System.out.println("target-label: "+this.target.getId());
+		Enumeration enumeration = this.distortions.keys();
+		while (enumeration.hasMoreElements()) {
+			GraphComponent key = (GraphComponent) enumeration.nextElement();
+			GraphComponent value = (GraphComponent) this.distortions.get(key);
+			
+			if(key.isNode() == false &&
+					key.getId().equals(Constants.EPS_ID) ==false ){
+				if(value.isNode() == false &&
+						value.getId().equals(Constants.EPS_ID) ==false ){
+					Edge e=(Edge) key;
+					if( e.isDirected()==true){
+						boolean isinverted = (Boolean) this.EdgeInverted.get(e);
+						e.setInverted(isinverted);
+						System.out.print( " \t inverted="+e.isInverted());
+					}
+				}
+			}
+				
+				
+			
+				System.out.print(key.getComponentId() + "\t --> \t"+ value.getComponentId()+"\t\t"+Constants.costFunction.getCosts(key, value));
+
+				
+				if(key.isNode() == false &&
+						key.getId().equals(Constants.EPS_ID) ==false ){
+					if(value.isNode() == false &&
+							value.getId().equals(Constants.EPS_ID) ==false ){
+						Edge e=(Edge) key;
+						if( e.isDirected()==true){
+							boolean isinverted = (Boolean) this.EdgeInverted.get(e);
+							e.setInverted(isinverted);
+							System.out.print( " \t inverted="+e.isInverted());
+						}
+					}
+				}
+				
+			
+		System.out.println();
+			
+			
+		}
+		
+	}
+
+	/**
+	 * asserts that all components are used
+	 * 
+	 * @return true if all components are used
+	 */
+	public boolean allUsed() {
+		int remaining = this.unUsedNodes1.size();
+		remaining += this.unUsedNodes2.size();
+		remaining += this.unUsedEdges1.size();
+		remaining += this.unUsedEdges2.size();
+		if (remaining != 0){
+			System.out.println(((Edge) this.unUsedEdges2.getFirst()).getComponentId());
+		}
+		return (remaining == 0);
+	}
+	
+	public int getNumberOfNodeOps(){
+		int space = 0;
+		Enumeration enumeration = this.distortions.keys();
+		while (enumeration.hasMoreElements()) {
+			GraphComponent key = (GraphComponent) enumeration.nextElement();
+			GraphComponent value = (GraphComponent) this.distortions.get(key);
+			if (key.isNode() || value.isNode()){
+				space++;
+			}
+		}
+		return space;
+	}
+
+	public Graph getSource() {
+		return source;
+	}
+
+	public Graph getTarget() {
+		return target;
+	}
+
+	@Override
+	public int compareTo(Object other) {
+		// TODO Auto-generated method stub
+		  double nombre1 = ((EditPath) other).getTotalCosts(); 
+	      double nombre2 = this.getTotalCosts(); 
+	      if (nombre1 > nombre2)  return -1; 
+	      else if(nombre1 == nombre2) return 0; 
+	      else return 1; 
+		
+	}
+	
+	  @Override
+		/**
+		 * @return the editPath as a string 
+		 * EditPath To String converter
+		 */
+	  public String toString() {		  
+	
+		  /* Format:
+		   *  < HeuristicCosts<>totalCosts<>getGraphId1<>getGraphId2<>getEdgesId1<>getEdgesId2<>getEdgesMode1<>getEdgesMode2<>
+		   *  <>noOfDistortedNodes<>unUsedNodes1<>unUsedNodes2<>unUsedEdges1<>unUsedEdges2<>Distortions<>invertedEdges
+		  */
+		  String str=""+HeuristicCosts+"<>"+totalCosts+"<>";
+		  str=str+source.getId()+"<>"+target.getId()+"<>";
+		  str=str+source.getEdgeId()+"<>"+target.getEdgeId()+"<>";
+		  str = str+ source.getEdgeMode()+"<>"+target.getEdgeMode();
+		  
+		  str=str+"<>"+noOfDistortedNodes+"<>";
+		  
+		  // Nodes1 Format:  <node1.toString()/node2.toString()/node3.toString()/.........etc>
+		  for(int i=0; i<unUsedNodes1.size();i++)
+		  {
+			  Node node1 = (Node) unUsedNodes1.get(i);
+			  str =str + node1.toString();
+			  if(i!=unUsedNodes1.size()-1)
+			  {
+				  str=str+"/";
+			  }
+		  }
+		  
+		  str=str+"<>";
+		// Nodes2 Format:  <node1.toString()/node2.toString()/node3.toString()/.........etc>
+		  for(int i=0; i<unUsedNodes2.size();i++)
+		  {
+			  Node node2 = (Node) unUsedNodes2.get(i);
+			  str =str + node2.toString();
+			  if(i!=unUsedNodes2.size()-1)
+			  {
+				  str=str+"/";
+			  } 
+		  }
+		
+		  str=str+"<>";
+		// Edges1 Format:  <edge1.toString()/edge2.toString()/edge3.toString()/.........etc>
+		  for(int i=0; i<unUsedEdges1.size();i++)
+		  {
+			  Edge edge1 = (Edge) unUsedEdges1.get(i);
+			  str=str+edge1.toString();
+			  if(i!=unUsedEdges1.size()-1)
+			  {
+				  str=str+"/";
+			  }
+		  }
+
+		  
+		  str=str+"<>";
+		// Edges2 Format:  <edge1.toString()/edge2.toString()/edge3.toString()/.........etc>
+		  for(int i=0; i<unUsedEdges2.size();i++)
+		  {
+			  Edge edge2 = (Edge) unUsedEdges2.get(i);
+			  str=str+edge2.toString();
+			  if(i!=unUsedEdges2.size()-1)
+			  {
+				  str=str+"/";
+			  }
+		  }
+		  
+		  str=str+"<>";
+		// Distortions:  <distortion1/distortion2/distortion3/.........etc>
+		  
+		 // System.out.println("--Distortions");
+		  Enumeration enumeration = this.distortions.keys();
+		 
+		    int counter=0; 
+			while (enumeration.hasMoreElements())
+			{
+				if(counter!=0)
+				{
+					str=str+"/";
+				}	
+				counter=1;
+				GraphComponent key = (GraphComponent) enumeration.nextElement();
+				GraphComponent value = (GraphComponent) this.distortions.get(key);
+				//System.out.println("--key ="+key.getComponentId()+", value = "+value.getComponentId());
+				
+				// edge  --- edge
+
+				if(key.isNode() == false  && value.isNode()==false){
+
+					str=str +"Edge%";
+					if(key.getComponentId().equals("eps_id"))
+					{
+						str=str+"eps_id"+">>";
+					}
+					else{
+						Edge keyEdge = (Edge)key;
+						str=str+keyEdge.toString()+">>";
+						//System.out.println("-- ketEdge :"+keyEdge.toString());
+					}
+					if(value.getComponentId().equals("eps_id"))
+					{
+						str=str+"eps_id";
+						
+					}
+					else{
+							Edge valueEdge =(Edge)value;
+							str=str+valueEdge.toString();
+						
+					}
+					
+				
+				}
+				// node 
+				else{
+					str= str+"Node%";
+					if(key.getComponentId().equals("eps_id"))
+					{
+						str=str+"eps_id"+">>";
+					}
+					else{
+						Node keyNode = (Node)key;
+						str=str+keyNode.toString()+">>";
+					}
+					if(value.getComponentId().equals("eps_id"))
+					{
+						str=str+"eps_id";
+					}
+					else{
+						Node valueNode =(Node)value;
+						str=str+valueNode.toString();
+					}
+				}
+			}
+			
+			str=str+"<>";
+			// invertedEdges Format: <invertedEdge1/invertedEdge2/ ...... >		
+			  Enumeration enumeration2 = this.EdgeInverted.keys();
+			    int counter1=0; 
+				while (enumeration.hasMoreElements())
+				{
+					if(counter1!=0)
+					{
+						str=str+"/";
+					}
+					counter=1;
+					Edge key = (Edge) enumeration.nextElement();
+					String value = this.EdgeInverted.get(key).toString();
+					str=str+key.toString()+"="+value;
+				}
+		  return str;
+		  }
+
+	  
+}

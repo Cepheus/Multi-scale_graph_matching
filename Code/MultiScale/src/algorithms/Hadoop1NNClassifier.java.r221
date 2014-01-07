@@ -1,0 +1,470 @@
+package algorithms;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.ToolRunner;
+
+import algorithms.testCode.Hadoop1NNMapper;
+import algorithms.testCode.Hadoop1NNReducer;
+
+import util.EditPath;
+import util.ExampleBaseJob;
+import util.Graph;
+import util.ICostFunction;
+import util.IEdgeHandler;
+import util.LetterCostFunction;
+import util.PairGraphDistance;
+import util.UniversalCostFunction;
+import util.UniversalEdgeHandler;
+import xml.XMLParser;
+
+/**
+ * Author : Zeina Abu-Aisheh
+ * This task concerns classifying test graphs given a list of training graphs 
+ *   The 1NN-classifier is used to classify graphs 
+ *   5 similarity measures are used here (where the variable methodNumber has to be set first in order to evaluate one of these similarity measures) 
+ *   
+ **/
+
+public class Hadoop1NNClassifier extends ExampleBaseJob {
+
+	/**
+	 * Haddoop1NNMapper class that has the map method that outputs intermediate keys and
+	 * values to be processed by the Hadoop1NNReducer.
+	 * 
+	 * The type parameters are the type of the input key, the type of the input
+	 * values, the type of the output key and the type of the output values
+	 * 
+	 * 
+	 * Input format (information about the graphs of the training list) : trainingGraphFileName<tab>trainingGraphClass 
+	 * 
+	 * Output format: <testGraphFileName, trainingGraphClass-distanceGED(testGraph,trainingGraph>
+	 * 
+	 *
+	 * 
+	 **/
+	
+	public static int kParameter = 0;
+//	public static int methodNumber;
+	
+	public static class Hadoop1NNMapper extends
+			Mapper<LongWritable, Text, Text, Text> {
+
+		@Override
+		public void map(LongWritable key, Text value, Context context)
+				throws IOException, InterruptedException {
+			// key: file's line number 
+			// Value <trainingGraphFileName<tab>trainingGraphClass>
+			/*Context is used to emit <key,value>
+			*where key = <testGraphFilePath>
+			*value=<trainingGraphClass-distanceGED(testGraph,trainingGraph)>
+			*/
+			
+			kParameter =  1;
+			
+			StringTokenizer itr = new StringTokenizer(value.toString());
+
+
+			double alpha=0.5;
+			double edgeCosts=10;
+			double nodeCosts=10;
+			
+			/*
+			 * methodNumber is a variable
+			 * 
+			 * MethodNumber = 1 (plain-GED)
+			 * MethodNumber = 2 (Heuristic GED)
+			 * MethodNumber = 3 (BeamSearch)
+			 * MethodNumber = 4 (Munkres's algorithm)
+			 * MethodNumber = 5 (Distributed GED)
+			 */
+		
+			int methodNumber = 5;
+			boolean debug=false;
+
+			/*Meanwhile I used the data that is listed in the example file (i.e. BipartiteGraphMatchingEditDistance/data/example/)
+			But we can change the cost function to work on the letter database..
+			*/
+			//Constants.costFunction = (ICostFunction)new UniversalCostFunction(0.5); 
+			//Constants.edgeHandler = new UniversalEdgeHandler();//UnDirectedEdgeHandler(); 
+			
+			Constants.costFunction = new LetterCostFunction(nodeCosts,edgeCosts,alpha);
+			Constants.edgeHandler = new UniversalEdgeHandler(); 
+					
+			String testGraphFileName="";
+		    String trainingGraphFileName=""; // training's file name.
+		    String trainingGraphClass=""; //training graph's class
+		    String testGraphClass=""; //test graph's class
+			XMLParser xmlParser = new XMLParser();
+			Graph testGraph = null; //  test graph
+			Graph trainingGraph = null; // training graph
+		    String path="/usr/local/Letter/MED/"; // the path where we can find both the test graphs and the training graphs
+			
+			//System.out.println("TEST PATH ::::"+testGraphPath);
+			String trainingGraphPath; // path of training graphs
+			String testGraphPath; // path of test graphs
+			double distance = 0.0;
+			
+					
+			// tokenizing the value parameter <trainingGraphFileName<tab>trainingGraphClass>
+			while (itr.hasMoreTokens()) {
+
+				// getting testGraphFileName
+				testGraphFileName = itr.nextToken();
+				testGraphPath=path+testGraphFileName;
+				
+				// getting trainingGraphFileName	
+				trainingGraphFileName = itr.nextToken();
+				trainingGraphPath = path+trainingGraphFileName;
+				try {
+					//parsing the training graph and the test graph
+					testGraph = xmlParser.parseGXL(testGraphPath);
+					trainingGraph= xmlParser.parseGXL(trainingGraphPath);
+					} 
+				catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//getting the class of the trainingGraph
+				trainingGraphClass = itr.nextToken();
+				
+				testGraphClass = itr.nextToken();
+				//System.out.println("graphFileClass:  "+trainingGraphClass+"");
+						  
+				System.out.println("Method NUMBER ========"+methodNumber);
+				
+				if(methodNumber == 1){
+					 GraphEditDistance GED = new GraphEditDistance(testGraph,trainingGraph,Constants.costFunction,Constants.edgeHandler,false);
+					 distance = GED.getBestEditpath().getTotalCosts();
+					 if(debug==true) System.out.println("Distance between "+testGraphFileName+"and "+trainingGraphFileName+" = "+distance);
+				}
+				else if(methodNumber == 2)
+				{
+					 HeuristicGraphEditDistance GEDH = new HeuristicGraphEditDistance(testGraph,trainingGraph,Constants.costFunction,Constants.edgeHandler ,false);
+					 distance = GEDH.getBestEditpath().getTotalCosts();
+					 if(debug==true) System.out.println("Distance between "+testGraphFileName+"and "+trainingGraphFileName+" = "+distance);
+				}
+
+				else if(methodNumber == 3)
+				{
+					BeamSearchGraphEditDistance GEDB = new BeamSearchGraphEditDistance(testGraph,trainingGraph,2, Constants.costFunction, Constants.edgeHandler ,false);
+					distance = GEDB.getBestEditpath().getTotalCosts();
+					if(debug==true) System.out.println("Distance between "+testGraphFileName+"and "+trainingGraphFileName+" = "+distance);
+				}
+				else if(methodNumber== 4)
+				{
+					MatrixGenerator mgen = new MatrixGenerator();
+					Munkres munkres = new Munkres();
+					MunkresRec munkresRec = new MunkresRec();
+					mgen.setMunkres(munkresRec);
+					double[][] matrix;
+					matrix = mgen.getMatrix(testGraph, trainingGraph);
+					munkres.setGraphs(testGraph, trainingGraph);
+					distance = munkres.getCosts(matrix);
+					if(debug==true) System.out.println("Distance between "+testGraphFileName+"and "+trainingGraphFileName+" = "+distance);
+				}
+				else if(methodNumber==5)
+				{
+					
+					int treeLevel = 1;
+					//	SET.StartChrono();
+					PartialSearchTree DGED = new PartialSearchTree(testGraph,trainingGraph,Constants.costFunction,Constants.edgeHandler,treeLevel,false);
+						
+					//----------------------------------------------------------------------
+					
+					String[] str={"",""};
+			//		str[0]="./data/results/"+testGraphFileName+"-"+trainingGraphFileName+".txt";
+					str[0]="./data/results/"+testGraphFileName+"-"+trainingGraphFileName+"Input";
+					str[1]="./data/results/"+testGraphFileName+"-"+trainingGraphFileName;
+					
+					
+			/*		File file = new File(str[0]);
+					 
+					// if file doesnt exists, then create it
+					if (!file.exists()) {
+						file.createNewFile();
+					}
+					
+					PrintStream ps = new PrintStream(file);
+					System.out.println(file);
+				       
+					
+					for(int i=0;i<DGED.OPEN.size();i++){
+						EditPath pp = DGED.OPEN.get(i);
+						String st = pp.toString();
+						if(debug==true) System.out.println(st);
+						ps.println(st);
+
+						
+					}
+						
+					ps.close();
+					
+				*/	
+					/////////////////////////////////////////////////////////////////////////////////
+					Configuration conf = new Configuration();
+					FileSystem fs = FileSystem.get(conf);
+					String name = testGraphFileName+"-"+trainingGraphFileName;
+				    // Path path1 = new Path("./data/results/"+testGraphFileName+"-"+trainingGraphFileName+".txt");
+				//	Path path1 = new Path(str[0]);
+				     
+				        // Create a new file and write data to it.
+				     //   FSDataOutputStream out = fs.create(path1);
+					     FSDataOutputStream out;
+				        for(int i=0;i<DGED.OPEN.size();i++){
+				        	Path path1 = new Path(str[0]+"/"+name+"_"+i+".txt");
+				        	out = fs.create(path1);
+				        	EditPath pp = DGED.OPEN.get(i);
+							String st = pp.toString();
+							if(debug==true) System.out.println(st);
+							//ps.println(st);
+							out.writeBytes(st);
+							out.writeBytes("\n");
+							out.close();
+							
+						}
+
+				        
+						
+					////////////////////////////////////////////////////////////////////////////	
+					int test=0;
+
+					try {
+						int res = ToolRunner.run(new Configuration(), new algorithms.DistributedPathCostCalculations(), str);
+						test=1;
+						System.out.println("TEST succeed::::" + test);
+					} catch (Exception e) {
+						test=-1;
+						System.out.println("fail ::::" + test);
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						
+					}
+					
+					//////////////////////////////////////////////////////////////////////////////////////////
+					
+			/*		BufferedReader br = new BufferedReader(new FileReader(str[1]+"/part-r-00000"));
+					String devstr;
+					//System.out.println("Printing file contents...");
+					String[] content={"",""};
+					while ((devstr = br.readLine()) != null) 
+					{
+						System.out.println(devstr);
+						content = devstr.split("\t");
+
+					}
+					distance = Double.parseDouble(content[1]);
+			*/		
+					/////////////////////////////////////////////////////////////////////////////////////////////
+					if(test==1)
+					{
+				    Path path2 = new Path(str[1]+"/part-r-00000");
+				    FSDataInputStream in = fs.open(path2);
+				    String[] content={"",""};  
+
+			        byte[] fileContent = new byte[1024];
+			        int numBytes = 0;
+			        while ((numBytes = in.read(fileContent)) > 0) {
+
+			            String stFileContent =  new String(fileContent);
+			            System.out.println(stFileContent);
+			            content = stFileContent.split("\t");
+
+			        }
+
+			        in.close();
+			        distance = Double.parseDouble(content[1]);
+					////////////////////////////////////////////////////////////////////////////////////////////
+					
+					
+					}
+				}
+				
+				
+				/*emit key, value pair from mapper
+				*where key = <testGraphFilePath>
+				*value=<trainingGraphFileName-trainingGraphClass-distanceGED(testGraph,trainingGraph)>
+				*/
+				context.write(new Text(testGraphFileName), new Text(trainingGraphClass+"-"+testGraphClass+"-"+distance));
+		    }
+				
+		}
+	}
+
+	/**
+	 * Reducer class for the classification problem
+	 * 
+	 * Input format :<testGraphFilePath, trainingGraphFileName-trainingGraphClass-distanceGED(testGraph,trainingGraph> 
+	 * Output format :<testGraphFilePath: recommended class>
+	 * 
+	 * 
+	 **/
+	public static class Hadoop1NNReducer extends
+			Reducer<Text, Text, Text, Text> {
+
+		@Override
+		public void reduce(Text key, Iterable<Text> values, Context context
+
+		) throws IOException, InterruptedException {
+            /*
+			*key = <testGraphFilePath>
+			*value=<trainingGraphFileName-trainingGraphClass-distanceGED(testGraph,trainingGraph)>
+			*/
+
+			String targetClass ="";
+			String trainingClass ="";
+			
+			System.out.println("******************************FILE: "+key.toString());
+			double minValue = Double.MAX_VALUE; // A variable that is used for choosing the nearest neighbor of the test graph
+			String graphClass="";
+			int counter = 0; // to see whether a test graph is well classified or not
+			String[] parts;
+			
+			for (Text val : values) {
+				String info = val.toString();
+
+				/*
+				 * splitting the val variable to take the information inside
+				 *  parts[0]: Graph's Class
+				 *  parts[1]: Heuristic GED
+				 */
+				parts= info.split("-"); 
+				//System.out.println("the length is::::::"+parts.length);
+				//System.out.println("distance ...."+parts[2]);
+				System.out.println("****" + Double.parseDouble(parts[2]));
+				//Choosing the minimal distance
+				minValue = Math.min(minValue, Double.parseDouble(parts[2]));
+
+				if(minValue==Double.parseDouble(parts[2]))
+				{
+					trainingClass =  parts[0];
+					targetClass = parts[1];
+				}
+			
+		}
+			
+			if(targetClass.equals(trainingClass))
+		 	{
+		 		counter++;
+		 	}
+			System.out.println("Min Value = "+minValue + " , targetClass ="+targetClass+ " and trainingClass =  "+trainingClass );
+
+		    //Emitting <key,value> = <testGraphFilePath: recommended class>
+			context.write(key, new Text(targetClass+"	"+counter));
+			
+		}
+	}
+
+	// method to set the configuration for the job and the mapper and the reducer classes
+	private Job getJobConf(String[] args) throws Exception {
+
+		JobInfo jobInfo = new JobInfo() {
+			@Override
+			public Class<? extends Reducer> getCombinerClass() {
+				return null; // we do not need a combiner at this moment
+			}
+
+			@Override
+			public Class<?> getJarByClass() {
+				return Hadoop1NNClassifier.class; // defining the Main class Name
+			}
+
+			@Override
+			public Class<? extends Mapper> getMapperClass() {
+				return Hadoop1NNMapper.class;  // defining the Mapper function
+			}
+
+			@Override
+			public Class<?> getOutputKeyClass() {
+				return Text.class;
+			}
+
+			@Override
+			public Class<?> getOutputValueClass() {
+				return Text.class;
+			}
+
+			@Override
+			public Class<? extends Reducer> getReducerClass() {
+				return Hadoop1NNReducer.class; // defining the Reducer function
+			}
+			
+		};
+		
+		return setupJob("Hadoop1NNClassifier", jobInfo);
+
+		
+	}
+
+	@Override
+	public int run(String[] args) throws Exception {
+
+
+		//FileInputFormat.addInputPath(job, new Path("./data/Letter/MED/inputFile.txt"));// specify the input path to be the first command-line argument passed by the user
+	/*	FileInputFormat.addInputPath(job, new Path(args[0]));// specify the input path to be the first command-line argument passed by the user
+		//FileOutputFormat.setOutputPath(job, new Path("./data/results/GraphsClassification"));// specify the output path to be the second command-line argument passed by the user
+
+		FileOutputFormat.setOutputPath(job, new Path(args[1]));// specify the output path to be the second command-line argument passed by the user
+
+		return job.waitForCompletion(true) ? 0 : 1;// wait for the job to complete
+		*/
+		
+		
+
+		    Configuration conf = new Configuration();
+	        conf.set("mapred.jar","/usr/local/hadoop/project.jar");
+	        Job job = new Job(conf, "Hadoop1NNClassifier");
+	        //job.setJarByClass(algorithms.TestClass.class);
+	        System.out.println("JAR"+job.getJar());
+	        job.setMapperClass(Hadoop1NNMapper.class);
+	        System.out.print("------------------"+job.getMapperClass());
+	        job.setReducerClass(Hadoop1NNReducer.class);
+	        job.setOutputKeyClass(Text.class);
+	        job.setOutputValueClass(Text.class);
+	        FileInputFormat.addInputPath(job, new Path(args[0]));// specify the input path to be the first command-line argument passed by the user
+	        FileOutputFormat.setOutputPath(job, new Path(args[1]));// specify the output path to be the second command-line argument passed by the user
+	       // System.exit(job.waitForCompletion(true) ? 0 : 1);
+	        return job.waitForCompletion(true) ? 0 : 1;// wait for the job to complete
+		
+	}
+
+	public static void main(String[] args) throws Exception {
+
+		final double start; // starting time
+		final double end; // ending time
+		
+		File file = new File("./data/runningTime.txt");
+		
+		PrintStream ps = new PrintStream(file);
+		
+		
+		System.out.println("***************"+kParameter+"*********");
+		//methodNumber =  Integer.parseInt(args[2]);
+		//System.out.println("*******methodNumber********"+methodNumber+"*********");
+		start =System.currentTimeMillis();
+		int res = ToolRunner.run(new Configuration(), new Hadoop1NNClassifier(), args);
+		end =System.currentTimeMillis();
+		
+		System.out.println("FINISHED :::: TIME TAKEN TO CLASSIFY GRAPHS :: "+(end-start));
+		ps.println(end-start);
+		ps.close();
+
+		System.exit(res);
+	}
+}

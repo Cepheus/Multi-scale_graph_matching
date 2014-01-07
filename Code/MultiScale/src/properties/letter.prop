@@ -1,0 +1,4 @@
+source=data/Letter/MED/test1.cxl
+target=data/Letter/MED/train1.cxl
+path=data/Letter/MED/
+result=data/Letter/

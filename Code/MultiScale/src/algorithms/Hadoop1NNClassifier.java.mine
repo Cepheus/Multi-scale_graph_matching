@@ -1,0 +1,240 @@
+package algorithms;
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.ToolRunner;
+
+import util.ExampleBaseJob;
+import util.Graph;
+import util.ICostFunction;
+import util.UniversalCostFunction;
+import util.UniversalEdgeHandler;
+import xml.XMLParser;
+
+/**
+ * Author : Zeina Abu-Aisheh
+ * This task concerns classifying test graphs given a list of training graphs 
+ *   The 1NN-classifier is used to classify graphs 
+ *   The HeuristicGED is used as a similarity measure 
+ *   
+ **/
+
+public class Hadoop1NNClassifier extends ExampleBaseJob {
+	
+	static String learningfil ="./datat/toto.txt";
+
+	/**
+	 * Haddoop1NNMapper class that has the map method that outputs intermediate keys and
+	 * values to be processed by the Hadoop1NNReducer.
+	 * 
+	 * The type parameters are the type of the input key, the type of the input
+	 * values, the type of the output key and the type of the output values
+	 * 
+	 * 
+	 * Input format (information about the graphs of the training list) : trainingGraphFileName<tab>trainingGraphClass 
+	 * 
+	 * Output format: <testGraphFileName, trainingGraphClass-distanceGED(testGraph,trainingGraph>
+	 * 
+	 *
+	 * 
+	 **/
+	public static class Hadoop1NNMapper extends
+			Mapper<LongWritable, Text, Text, Text> {
+
+		@Override
+		public void map(LongWritable key, Text value, Context context)
+				throws IOException, InterruptedException {
+			// key: file's line number 
+			// Value <trainingGraphFileName<tab>trainingGraphClass>
+			/*Context is used to emit <key,value>
+			*where key = <testGraphFilePath>
+			*value=<trainingGraphClass-distanceGED(testGraph,trainingGraph)>
+			*/
+			
+			StringTokenizer itr = new StringTokenizer(value.toString());
+
+			//context.getOutputCommitter().
+			double alpha=0.5;
+			double edgeCosts=10;
+			double nodeCosts=10;
+
+			/*Meanwhile I used the data that is listed in the example file (i.e. BipartiteGraphMatchingEditDistance/data/example/)
+			But we can change the cost function to work on the letter database..
+			*/
+			Constants.costFunction = (ICostFunction)new UniversalCostFunction(0.5); 
+			Constants.edgeHandler = new UniversalEdgeHandler();//UnDirectedEdgeHandler(); 
+					
+			String testGraphFileName="";
+		    String trainingGraphFileName=""; // training's file name.
+		    String trainingGraphClass=""; //training graph's class
+		    double distanceGED=0; // similarity distance (GED)
+			XMLParser xmlParser = new XMLParser();
+			Graph testGraph = null; //  test graph
+			Graph trainingGraph = null; // training graph
+		    String path="./data/example/"; // the path where we can find both the test graphs and the training graphs
+			
+			//System.out.println("TEST PATH ::::"+testGraphPath);
+			String trainingGraphPath; // path of training graphs
+			String testGraphPath; // path of test graphs
+			
+					
+			// tokenizing the value parameter <trainingGraphFileName<tab>trainingGraphClass>
+			// Il n'y a que deux tokens: Training File ----- La classe
+			while (itr.hasMoreTokens()) {
+
+				// getting testGraphFileName
+				testGraphFileName = itr.nextToken();
+				testGraphPath=path+testGraphFileName;
+				
+				// getting trainingGraphFileName	
+				trainingGraphFileName = itr.nextToken();
+				trainingGraphPath = path+trainingGraphFileName;
+				try {
+					//parsing the training graph and the test graph
+					testGraph = xmlParser.parseGXL(testGraphPath);
+					trainingGraph= xmlParser.parseGXL(trainingGraphPath);
+					} 
+				catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//getting the class of the trainingGraph
+				trainingGraphClass = itr.nextToken();
+				//System.out.println("graphFileClass:  "+trainingGraphClass+"");
+					
+				// Compute the heuristic GED distance 	
+				HeuristicGraphEditDistance GED = new HeuristicGraphEditDistance(testGraph,trainingGraph,Constants.costFunction, Constants.edgeHandler ,false);
+				distanceGED= GED.getBestEditpath().getTotalCosts();
+				//System.out.println("Distance between  "+trainingGraphFileName+"and"+testGraphPath+"is"+distanceGED);
+				    	
+				/*emit key, value pair from mapper
+				*where key = <testGraphFilePath>
+				*value=<trainingGraphFileName-trainingGraphClass-distanceGED(testGraph,trainingGraph)>
+				*/
+				context.write(new Text(testGraphFileName), new Text(trainingGraphClass+"-"+distanceGED));
+		    }
+				
+		}
+	}
+
+	/**
+	 * Reducer class for the classification problem
+	 * 
+	 * Input format :<testGraphFilePath, trainingGraphFileName-trainingGraphClass-distanceGED(testGraph,trainingGraph> 
+	 * Output format :<testGraphFilePath: recommended class>
+	 * 
+	 * 
+	 **/
+	public static class Hadoop1NNReducer extends
+			Reducer<Text, Text, Text, Text> {
+
+		@Override
+		public void reduce(Text key, Iterable<Text> values, Context context
+
+		) throws IOException, InterruptedException {
+            /*
+			*key = <testGraphFilePath>
+			*value=<trainingGraphFileName-trainingGraphClass-distanceGED(testGraph,trainingGraph)>
+			*/
+
+			double minValue = Double.MAX_VALUE; // A variable that is used for choosing the nearest neighbor of the test graph
+			String graphClass="";
+			String[] parts;
+			
+			for (Text val : values) {
+				String info = val.toString();
+				
+				/*
+				 * splitting the val variable to take the information inside
+				 *  parts[0]: Graph's Class
+				 *  parts[1]: Heuristic GED
+				 */
+				parts= info.split("-"); 
+				//System.out.println("the length is::::::"+parts.length);
+				//System.out.println("distance ...."+parts[2]);
+				
+				//Choosing the minimal distance
+				minValue = Math.min(minValue, Double.parseDouble(parts[1]));
+				if(minValue==Double.parseDouble(parts[1]))
+				{
+					System.out.println("*******"+minValue);	
+				    // Saving the class that has  the minimal distance in "classGraph"
+					graphClass=parts[0]; 
+					//	System.out.println("*******"+graphClass);
+				}
+			
+		}
+
+		    //Emitting <key,value> = <testGraphFilePath: recommended class>
+			context.write(key, new Text(graphClass));
+			
+		}
+	}
+
+	// method to set the configuration for the job and the mapper and the reducer classes
+	private Job getJobConf(String[] args) throws Exception {
+
+		JobInfo jobInfo = new JobInfo() {
+			@Override
+			public Class<? extends Reducer> getCombinerClass() {
+				return null; // we do not need a combiner at this moment
+			}
+
+			@Override
+			public Class<?> getJarByClass() {
+				return Hadoop1NNClassifier.class; // defining the Main class Name
+			}
+
+			@Override
+			public Class<? extends Mapper> getMapperClass() {
+				return Hadoop1NNMapper.class;  // defining the Mapper function
+			}
+
+			@Override
+			public Class<?> getOutputKeyClass() {
+				return Text.class;
+			}
+
+			@Override
+			public Class<?> getOutputValueClass() {
+				return Text.class;
+			}
+
+			@Override
+			public Class<? extends Reducer> getReducerClass() {
+				return Hadoop1NNReducer.class; // defining the Reducer function
+			}
+			
+		};
+		
+		return setupJob("Hadoop1NNClassifier", jobInfo);
+
+		
+	}
+
+	@Override
+	public int run(String[] args) throws Exception {
+		Job job = getJobConf(args);
+
+		FileInputFormat.addInputPath(job, new Path("./data/example/list.txt"));// specify the input path to be the first command-line argument passed by the user
+		FileOutputFormat.setOutputPath(job, new Path("./data/example/outputGraph2"));// specify the output path to be the second command-line argument passed by the user
+
+		return job.waitForCompletion(true) ? 0 : 1;// wait for the job to complete
+	}
+
+	public static void main(String[] args) throws Exception {
+		 Hadoop1NNClassifier HD = new Hadoop1NNClassifier();
+		 HD.learningfil = args[1];
+		int res = ToolRunner.run(new Configuration(), new Hadoop1NNClassifier(), args);
+		System.exit(res);
+	}
+}

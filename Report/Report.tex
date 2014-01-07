@@ -1,0 +1,107 @@
+\documentclass[UTF8, twoside]{EPURapport}
+\input{include.tex}
+
+\thedocument{Pattern recognition project draft}{Multi-scale graph comparision}{Multi-scale graph comparision}
+
+\grade{Computer Aided Decision Support\\ International Research Master 2\\ 2013 - 2014}
+
+\authors{%
+	\category{Student}{%
+		\name{Thomas NOGUER} \mail{thomas.noguer@etu.univ-tours.fr}
+	}
+	\details{M2RI CADS 2013 - 2014}
+}
+
+\supervisors{%
+	\category{Supervisors}{%
+		\name{Romain RAVEREAUX} \mail{romain.raveaux@univ-tours.fr}
+	}
+	\details{Université François-Rabelais, Tours}
+}
+
+\abstracts{abstract}
+{keywords}
+
+\begin{document}
+
+\chapter{Formalization of the problem}
+
+	\hspace{4ex}When we wish to do the comparaison of two graphs, we can come to a limitation when handling high sized graphs. The community detection algorithms allow to simplify a graph by finding communities of highly related nodes. It is then legitimate to want to use such algorithm to reduce the size of graphs in order to perform calculations that are greedy for computation time.
+	
+	For this project we choose to use a community detection algorithm for graph comparision. The Louvain's method is very fast and easy to implement. The graph edit distance method is known to be very slow when dealing with high scaled graphs. In this project we want to use the community detection to simplify the graphs to be used in the graph edit distance so we can still compare them with a good computation time.
+	
+	There is still an issue to solve, how do we use one method with the other. The Louvain's method can be used in several iterations to make the graph more and more simple. We must find a relation between the edit distance between two graphs at different scales and the edit distance between the unchanged graphs. At which scale do we decide that the edit distance is close enough to our original graph? Can we use the different scales together in order to be closer to the distance between the origal graphs? These questions are at the center of our problem.
+	
+\chapter{Graph Edit Distance}
+
+	\hspace{4ex}We use the following algorithm in order to find the edit distance between two graphs $G1$ and $G2$:
+	
+\begin{algorithm}
+  \caption{Graph Edit Distance}
+  \begin{algorithmic}[1]
+      \Repeat
+      	\For{each node $n \in G1$}
+		  \State Add every possible transformation $n$ into the search tree.
+		  \State Select a path using $A^*$ and heuristics.
+		\EndFor
+		\For{each remaining node $n$ of $G2$}
+		  \State Add every needed insertion of existing node into the search tree.
+		  \State Select a path using $A^*$ and heuristics.
+		\EndFor
+	  \Until{The path is complete}
+	  \State \Return The cost of the found path.
+  \end{algorithmic}
+\end{algorithm}
+
+\chapter{Community detection: Louvain's method}
+
+	\hspace{4ex}This method is based on two formulas: the modularity $Q$ and the composite modularity gain $\Delta Q$. The modularity of a graph is found following this formula:
+\\
+
+\[
+Q = \frac{1}{2m}\underset{i,j}{\sum}\left[A_{ij} - \frac{k_ik_j}{2m}\right] \delta(c_i,c_j),
+\]
+
+	Where $m$ is the sum of the weights of all the links in the graph ($m = \frac{1}{2}\underset{ij}{\sum}A_{ij}$), $A_{ij}$ the weight of the edge between $i$ and $j$, $k_i$ is the sum of the weights of the edges attached to vertex $i$, $c_i$ is the community to which vertex $i$ is assigned and finally $\delta$ is a function where $\delta(u,v)$ is 1 if $u=v$ and 0 otherwise.
+\\
+	
+	The gain in modularity from moving a node $i$ into a community $C$ is defined by the following formula:
+\\
+
+\[
+\Delta Q = \left[ \frac{\sum_{in}+k_{i,in}}{2m} - \left( \frac{\sum_{tot}+k_i}{2m} \right)^2 \right] -  \left[ \frac{\sum_{in}}{2m} - \left( \frac{\sum_{tot}}{2m} \right)^2 - \left( \frac{k_i}{2m} \right)^2 \right]
+\]
+
+	Where $\sum_{in}$ is the sum of the weights of the links inside the community $C$, $\sum_{tot}$ is the sum of the weights of the links incident to nodes in C and $k_{i,in}$ is the sum of the weights of the links from $i$ to nodes in $C$.
+\\
+
+	We use the following algorithm in order to find the communities of our graphs:
+
+
+\begin{algorithm}
+  \caption{Louvain's method}
+  \begin{algorithmic}[1]
+      \State Assign each node to a unique community.
+      \State Compute the initial modularity.
+      \Repeat
+      	\For{$i \in V$}
+		  \For{$j \in V$}
+		  	\State Remove $i$ from its community and place it into $j$'s.
+		  	\State Compute the composite modularity gain $\Delta Q$.
+		  \EndFor
+		  \If{There exists a positive gain}
+		  	\State Choose $j$ with the maximum gain and truly move $i$ to $j$'s community.
+		  \Else
+		  	\State $i$ stays in its community.
+		  \EndIf
+		\EndFor
+	  \Until{No further improvement in modularity}
+  \end{algorithmic}
+\end{algorithm}
+
+\chapter{Multi-scale graph comparision}
+
+	\textit{Explain here how we choosed to use both methods together in order to do multi-scale comparision.}	
+	
+	
+\end{document}

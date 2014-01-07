@@ -1,0 +1,4 @@
+source=C:\\dev\\devshared\\BipartiteGraphMatchingEditDistance\\data\\GREC\\data\\train.cxl
+target=C:\\dev\\devshared\\BipartiteGraphMatchingEditDistance\\data\\GREC\\data\\test.cxl
+path=C:\\dev\\devshared\\BipartiteGraphMatchingEditDistance\\data\\GREC\\data\\
+result=C:\\dev\\devshared\\BipartiteGraphMatchingEditDistance\\data\\GREC\\
