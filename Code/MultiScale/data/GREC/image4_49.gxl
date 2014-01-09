@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="sampletest150-mod5_image4.bmp" role="" edgemode="undirected">
+    <node id="0">
+      <attr name="x">
+        <Integer>443</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>73</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="1">
+      <attr name="x">
+        <Integer>67</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>427</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="2">
+      <attr name="x">
+        <Integer>470</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>449</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="3">
+      <attr name="x">
+        <Integer>68</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>55</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="4">
+      <attr name="x">
+        <Integer>140</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>499</Integer>
+      </attr>
+      <attr name="type">
+        <String>endpoint</String>
+      </attr>
+    </node>
+    <edge id="0-3-0" to="3" from="0">
+      <attr name="distance">
+        <float>375.431751454242</float>
+      </attr>
+    </edge>
+    <edge id="0-2-1" to="2" from="0">
+      <attr name="distance">
+        <float>376.968168417441</float>
+      </attr>
+    </edge>
+    <edge id="1-3-2" to="3" from="1">
+      <attr name="distance">
+        <float>372.001344083593</float>
+      </attr>
+    </edge>
+    <edge id="1-2-3" to="2" from="1">
+      <attr name="distance">
+        <float>403.600049554011</float>
+      </attr>
+    </edge>
+    <edge id="1-4-4" to="4" from="1">
+      <attr name="distance">
+        <float>102.532921542303</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

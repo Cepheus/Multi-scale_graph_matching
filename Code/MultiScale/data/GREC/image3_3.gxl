@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="sampletest150-mod1_image3.bmp" role="" edgemode="undirected">
+    <node id="0">
+      <attr name="x">
+        <Integer>256</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>307</Integer>
+      </attr>
+      <attr name="type">
+        <String>circle</String>
+      </attr>
+    </node>
+    <node id="1">
+      <attr name="x">
+        <Integer>392</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>342</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="2">
+      <attr name="x">
+        <Integer>103</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>404</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="3">
+      <attr name="x">
+        <Integer>413</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>411</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="4">
+      <attr name="x">
+        <Integer>116</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>350</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <edge id="1-4-0" to="4" from="1">
+      <attr name="distance">
+        <float>276.115917686757</float>
+      </attr>
+    </edge>
+    <edge id="2-3-1" to="3" from="2">
+      <attr name="distance">
+        <float>310.079022186281</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

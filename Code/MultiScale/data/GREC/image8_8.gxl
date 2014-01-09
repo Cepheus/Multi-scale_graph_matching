@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="sampletest150-mod1_image8.bmp" role="" edgemode="undirected">
+    <node id="0">
+      <attr name="x">
+        <Integer>92</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>368</Integer>
+      </attr>
+      <attr name="type">
+        <String>endpoint</String>
+      </attr>
+    </node>
+    <node id="1">
+      <attr name="x">
+        <Integer>263</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>128</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="2">
+      <attr name="x">
+        <Integer>400</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>362</Integer>
+      </attr>
+      <attr name="type">
+        <String>endpoint</String>
+      </attr>
+    </node>
+    <node id="3">
+      <attr name="x">
+        <Integer>266</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>250</Integer>
+      </attr>
+      <attr name="type">
+        <String>circle</String>
+      </attr>
+    </node>
+    <edge id="0-1-0" to="1" from="0">
+      <attr name="distance">
+        <float>294.687970572265</float>
+      </attr>
+    </edge>
+    <edge id="1-2-1" to="2" from="1">
+      <attr name="distance">
+        <float>271.154937259125</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

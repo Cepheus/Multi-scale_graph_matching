@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="VP1_0051" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>0.4071</float>
+      </attr>
+      <attr name="y">
+        <float>2.82616</float>
+      </attr>
+    </node>
+    <node id="_1">
+      <attr name="x">
+        <float>1.60593</float>
+      </attr>
+      <attr name="y">
+        <float>0.485506</float>
+      </attr>
+    </node>
+    <node id="_2">
+      <attr name="x">
+        <float>1.57317</float>
+      </attr>
+      <attr name="y">
+        <float>2.84377</float>
+      </attr>
+    </node>
+    <edge id="_0-_1-0" to="_1" from="_0">
+      <attr name="distance">
+        <float>2.62980123138917</float>
+      </attr>
+    </edge>
+    <edge id="_0-_2-1" to="_2" from="_0">
+      <attr name="distance">
+        <float>1.16620296561105</float>
+      </attr>
+    </edge>
+    <edge id="_1-_2-2" to="_2" from="_1">
+      <attr name="distance">
+        <float>2.35849153301342</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

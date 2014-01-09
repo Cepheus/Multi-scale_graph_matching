@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="sampletest150-mod3_image17.bmp" role="" edgemode="undirected">
+    <node id="0">
+      <attr name="x">
+        <Integer>348</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>214</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="1">
+      <attr name="x">
+        <Integer>352</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>310</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="2">
+      <attr name="x">
+        <Integer>60</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>295</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="3">
+      <attr name="x">
+        <Integer>413</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>265</Integer>
+      </attr>
+      <attr name="type">
+        <String>circle</String>
+      </attr>
+    </node>
+    <node id="4">
+      <attr name="x">
+        <Integer>451</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>313</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="5">
+      <attr name="x">
+        <Integer>41</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>221</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="6">
+      <attr name="x">
+        <Integer>464</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>202</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="7">
+      <attr name="x">
+        <Integer>387</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>315</Integer>
+      </attr>
+      <attr name="type">
+        <String>endpoint</String>
+      </attr>
+    </node>
+    <edge id="0-5-0" to="5" from="0">
+      <attr name="distance">
+        <float>307.07979419037</float>
+      </attr>
+    </edge>
+    <edge id="0-1-1" to="1" from="0">
+      <attr name="distance">
+        <float>96.0832971957145</float>
+      </attr>
+    </edge>
+    <edge id="0-6-2" to="6" from="0">
+      <attr name="distance">
+        <float>116.619037896906</float>
+      </attr>
+    </edge>
+    <edge id="1-2-3" to="2" from="1">
+      <attr name="distance">
+        <float>292.385020136121</float>
+      </attr>
+    </edge>
+    <edge id="1-4-4" to="4" from="1">
+      <attr name="distance">
+        <float>99.0454441153151</float>
+      </attr>
+    </edge>
+    <edge id="2-5-5" to="5" from="2">
+      <attr name="distance">
+        <float>76.4002617796562</float>
+      </attr>
+    </edge>
+    <edge id="4-6-6" to="6" from="4">
+      <attr name="distance">
+        <float>111.758668567588</float>
+      </attr>
+    </edge>
+    <edge id="1-7-7" to="7" from="1">
+      <attr name="distance">
+        <float>35.3553390593274</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="sampletest150-mod3_image1.bmp" role="" edgemode="undirected">
+    <node id="0">
+      <attr name="x">
+        <Integer>16</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>-17</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="1">
+      <attr name="x">
+        <Integer>521</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>-30</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="2">
+      <attr name="x">
+        <Integer>514</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>459</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="3">
+      <attr name="x">
+        <Integer>514</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>547</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="4">
+      <attr name="x">
+        <Integer>8</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>471</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="5">
+      <attr name="x">
+        <Integer>-8</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>456</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="6">
+      <attr name="x">
+        <Integer>-1</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>522</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <edge id="0-5-0" to="5" from="0">
+      <attr name="distance">
+        <float>473.608488099612</float>
+      </attr>
+    </edge>
+    <edge id="0-1-1" to="1" from="0">
+      <attr name="distance">
+        <float>505.167299020829</float>
+      </attr>
+    </edge>
+    <edge id="1-2-2" to="2" from="1">
+      <attr name="distance">
+        <float>489.050099683049</float>
+      </attr>
+    </edge>
+    <edge id="2-4-3" to="4" from="2">
+      <attr name="distance">
+        <float>506.142272488675</float>
+      </attr>
+    </edge>
+    <edge id="2-3-4" to="3" from="2">
+      <attr name="distance">
+        <float>88</float>
+      </attr>
+    </edge>
+    <edge id="3-6-5" to="6" from="3">
+      <attr name="distance">
+        <float>515.606439059871</float>
+      </attr>
+    </edge>
+    <edge id="4-5-6" to="5" from="4">
+      <attr name="distance">
+        <float>21.9317121994613</float>
+      </attr>
+    </edge>
+    <edge id="4-6-7" to="6" from="4">
+      <attr name="distance">
+        <float>51.7880295048962</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

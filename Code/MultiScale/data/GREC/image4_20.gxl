@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="sampletest150-mod2_image4.bmp" role="" edgemode="undirected">
+    <node id="0">
+      <attr name="x">
+        <Integer>459</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>436</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="1">
+      <attr name="x">
+        <Integer>408</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>437</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="2">
+      <attr name="x">
+        <Integer>100</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>457</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="3">
+      <attr name="x">
+        <Integer>71</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>72</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="4">
+      <attr name="x">
+        <Integer>407</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>473</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="5">
+      <attr name="x">
+        <Integer>58</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>434</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="6">
+      <attr name="x">
+        <Integer>96</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>443</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="7">
+      <attr name="x">
+        <Integer>457</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>68</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <edge id="0-1-0" to="1" from="0">
+      <attr name="distance">
+        <float>51.0098029794274</float>
+      </attr>
+    </edge>
+    <edge id="0-7-1" to="7" from="0">
+      <attr name="distance">
+        <float>368.005434742478</float>
+      </attr>
+    </edge>
+    <edge id="1-6-2" to="6" from="1">
+      <attr name="distance">
+        <float>312.0576869747</float>
+      </attr>
+    </edge>
+    <edge id="1-4-3" to="4" from="1">
+      <attr name="distance">
+        <float>36.0138862107382</float>
+      </attr>
+    </edge>
+    <edge id="2-6-4" to="6" from="2">
+      <attr name="distance">
+        <float>14.560219778561</float>
+      </attr>
+    </edge>
+    <edge id="2-4-5" to="4" from="2">
+      <attr name="distance">
+        <float>307.416655371826</float>
+      </attr>
+    </edge>
+    <edge id="3-5-6" to="5" from="3">
+      <attr name="distance">
+        <float>362.233350203981</float>
+      </attr>
+    </edge>
+    <edge id="3-7-7" to="7" from="3">
+      <attr name="distance">
+        <float>386.02072483223</float>
+      </attr>
+    </edge>
+    <edge id="5-6-8" to="6" from="5">
+      <attr name="distance">
+        <float>39.0512483795333</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

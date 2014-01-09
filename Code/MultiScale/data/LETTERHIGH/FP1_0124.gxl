@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="FP1_0124" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>0.677488</float>
+      </attr>
+      <attr name="y">
+        <float>2.82364</float>
+      </attr>
+    </node>
+    <node id="_1">
+      <attr name="x">
+        <float>0.478318</float>
+      </attr>
+      <attr name="y">
+        <float>0.617402</float>
+      </attr>
+    </node>
+    <node id="_2">
+      <attr name="x">
+        <float>0.52</float>
+      </attr>
+      <attr name="y">
+        <float>1.77</float>
+      </attr>
+    </node>
+    <node id="_3">
+      <attr name="x">
+        <float>2.32675</float>
+      </attr>
+      <attr name="y">
+        <float>1.80198</float>
+      </attr>
+    </node>
+    <node id="_4">
+      <attr name="x">
+        <float>1.84652</float>
+      </attr>
+      <attr name="y">
+        <float>0.709445</float>
+      </attr>
+    </node>
+    <edge id="_0-_1-0" to="_1" from="_0">
+      <attr name="distance">
+        <float>2.21520987753847</float>
+      </attr>
+    </edge>
+    <edge id="_0-_3-1" to="_3" from="_0">
+      <attr name="distance">
+        <float>1.94006554019291</float>
+      </attr>
+    </edge>
+    <edge id="_1-_2-2" to="_2" from="_1">
+      <attr name="distance">
+        <float>1.15335143764943</float>
+      </attr>
+    </edge>
+    <edge id="_2-_3-3" to="_3" from="_2">
+      <attr name="distance">
+        <float>1.80703300548164</float>
+      </attr>
+    </edge>
+    <edge id="_2-_4-4" to="_4" from="_2">
+      <attr name="distance">
+        <float>1.69836162769447</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

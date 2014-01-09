@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="sampletest150-mod5_image2.bmp" role="" edgemode="undirected">
+    <node id="0">
+      <attr name="x">
+        <Integer>523</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>523</Integer>
+      </attr>
+      <attr name="type">
+        <String>endpoint</String>
+      </attr>
+    </node>
+    <node id="1">
+      <attr name="x">
+        <Integer>469</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>-17</Integer>
+      </attr>
+      <attr name="type">
+        <String>intersection</String>
+      </attr>
+    </node>
+    <node id="2">
+      <attr name="x">
+        <Integer>538</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>458</Integer>
+      </attr>
+      <attr name="type">
+        <String>corner</String>
+      </attr>
+    </node>
+    <node id="3">
+      <attr name="x">
+        <Integer>28</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>527</Integer>
+      </attr>
+      <attr name="type">
+        <String>endpoint</String>
+      </attr>
+    </node>
+    <node id="4">
+      <attr name="x">
+        <Integer>543</Integer>
+      </attr>
+      <attr name="y">
+        <Integer>35</Integer>
+      </attr>
+      <attr name="type">
+        <String>endpoint</String>
+      </attr>
+    </node>
+    <edge id="0-2-0" to="2" from="0">
+      <attr name="distance">
+        <float>66.7083203206317</float>
+      </attr>
+    </edge>
+    <edge id="1-3-1" to="3" from="1">
+      <attr name="distance">
+        <float>700.297793799181</float>
+      </attr>
+    </edge>
+    <edge id="1-2-2" to="2" from="1">
+      <attr name="distance">
+        <float>479.985416445125</float>
+      </attr>
+    </edge>
+    <edge id="1-4-3" to="4" from="1">
+      <attr name="distance">
+        <float>90.4433524367601</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

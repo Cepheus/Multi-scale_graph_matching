@@ -232,213 +232,36 @@ public class MultiScaleGraphEditDistance {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		
-		System.out.println("Before executing the Graph Edit Distance function");
-		//t1(); // gxl graphs 
-		//t2();
-		t4(); // linear graphs
-		System.out.println("After executing the Graph Edit Distance function ");
+		System.out.println("Before executing the Multi Scale Graph Edit Distance function");
 		
-		
-	}
-	
-	private static void t3() {
-		// TODO Auto-generated method stub
-		double alpha=0.5;
-		double edgeCosts=2;
-		double nodeCosts=2;
-		int noOfNodesG12=10;
-		
-		SpeedEvalTest SET = new SpeedEvalTest("TestGraphEditDistance-TIME.txt");
-		SpeedEvalTest COST = new SpeedEvalTest("TestGraphEditDistance-COST.csv");
-		SpeedEvalTest SIZE = new SpeedEvalTest("TestGraphEditDistance-SIZE.csv");
-		
-		// set the appropriate cost function
-	    //Constants.costFunction = (ICostFunction)new UniversalCostFunction(0.5); // to give a value for alpha which is 0.5
-		Constants.costFunction = (ICostFunction)new UnlabeledCostFunction(nodeCosts, edgeCosts, alpha); 
-		
-		// set the appropriate edgehandler (directed or undirected)
-		Constants.edgeHandler = new UniversalEdgeHandler(); 
-		XMLWriter xmlWriter = new XMLWriter();
-		Graph g1 = SET.SyntheticLinearGraph(noOfNodesG12);
-		GraphEditDistance GED ;
-		int noOFNodes;
-		for(int i=0;i<noOfNodesG12;i++){
-			noOFNodes=i+1;
-			System.out.println("-----------------------"+noOFNodes+"-------------------------------");
-			
-			Graph g2 = SET.SyntheticLinearGraph(noOFNodes);
-			//System.out.println("Comparing 100 and "+(i+1));
-			
-			//SET.StartChrono();
-			//SET.SetUpTimeSensors();
-			GED = new GraphEditDistance(g1,g2,Constants.costFunction,Constants.edgeHandler,false);
-			//SET.CpuDisplay(noOFNodes);
-			//	System.out.println("i="+(i+1)+"   "+GED.getBestEditpath().getTotalCosts());
-			//SET.StopChrono();
-			//SET.WriteElapsedTime();
-			
-			System.out.println("The best solution is=");
-			GED.getBestEditpath().printMe();
-
-			System.out.print("The total cost of "+noOfNodesG12+" nodes is :");
-			System.out.println(GED.getBestEditpath().getTotalCosts());
-
-			
-			COST.GetPrintStream().print(noOfNodesG12);
-			COST.GetPrintStream().println (";"+GED.getBestEditpath().getTotalCosts());
-			
-			SIZE.GetPrintStream().print(noOFNodes);
-			SIZE.GetPrintStream().print(";"+GED.openCounterSize);
-			SIZE.GetPrintStream().println(";"+GED.editPathCounter);
-			
-			
-			System.out.println("OPEN max size = "+GED.openCounterSize);
-			System.out.println("No of edit paths = "+GED.editPathCounter);
-
-			
-		}
-		
-		SET.CloseStream();
-		COST.CloseStream();
-		SIZE.CloseStream();
-		
-		
-	}
-	
-	
-	private static void t1() {
-		// TODO Auto-generated method stub
-		double alpha=0.5;
-		double edgeCosts=2;
-		double nodeCosts=2;
-		String sg1;
-		String sg2;
-		SpeedEvalTest SET = new SpeedEvalTest("Dijkstra 5-7.txt");
-
-		sg1 = "./data/example/15.gxl";
-	    sg2 = "./data/example/30.gxl";
-		 //GraphCollection source, target;
-		// TODO Auto-generated method stub
-	    
-		// set the appropriate cost function
-		//Constants.costFunction = (ICostFunction)new UnlabeledCostFunction(nodeCosts, edgeCosts, alpha); // TODO 1
-		//Constants.costFunction = (ICostFunction)new MoleculesCostFunction(nodeCosts, edgeCosts); 
-		//Constants.costFunction = (ICostFunction)new UnlabeledCostFunction(nodeCosts, edgeCosts, alpha);
-		Constants.costFunction = (ICostFunction)new UniversalCostFunction(0.5);
-		
-		 // set the appropriate edgehandler (directed or undirected)
-		Constants.edgeHandler = new UniversalEdgeHandler();//UnDirectedEdgeHandler(); 
-		
-		// source = new GraphCollection();
-		// source.setCollectionName(args[0]);
-		 
-		 
-		 //target = new GraphCollection();
-		 //target.setCollectionName(args[1]);
+		/** PARSING */
+		File repertoire = new File("./data/test");
+		if(!repertoire.exists()){
+			System.out.println("Le répertoire n'existe pas");
+		}		
+		File[] files=repertoire.listFiles(gxlFileFilter);
+		Graph[] graphTab = new Graph[files.length];
 		
 		XMLParser xmlParser = new XMLParser();
-		Graph g1 = null;
-		Graph g2 = null;
-		try {
-			g1 = xmlParser.parseGXL(sg1);
-			g2= xmlParser.parseGXL(sg2);
-			SET.StartChrono();
-			GraphEditDistance GED = new GraphEditDistance(g1,g2,Constants.costFunction,Constants.edgeHandler,false);
-			SET.StopChrono();
-			SET.WriteElapsedTime();
-			System.out.println("****************The best solution is=");
-			GED.getBestEditpath().printMe();
-			System.out.println("COST :::: "+GED.getBestEditpath().getTotalCosts());
+		try
+		{
+			for(int i=0;i<files.length;i++)
+			{	
+				graphTab[i] = xmlParser.parseGXL(files[i].toString());
+				System.out.println(files[i].toString());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//source.add(g2);
-		//target.add(g1);
-		SET.CloseStream();
+		/** EXECUTION */
+		Graph g1;
+		g1 = graphTab[4];
+		Louvain louvain = new Louvain(g1, "valence");
+		
+		System.out.println("After executing the Multi Scale  Graph Edit Distance function ");	
 	}
-	
-	//
-	
-	/////////////////////////////////////////////////////////////////////////////////
-	
-	//Romain's Codes For time monitoring
-	
-
-
-	
-	// Zeina has commented this code
-	/*
-	private static void t1() {
-		// TODO Auto-generated method stub
-		double alpha=0.5;
-		double edgeCosts=0.5;
-		double nodeCosts=0.5;
-		String sg1;
-		String sg2;
-		//sg1 =  args[0];
-		//sg2 =  args[1];
-		//sg1 = "./data/g1test.gxl";
-		//sg2 = "./data/g2test.gxl";
-		//sg1 = "./data/example/5.gxl";
-	  // sg2 = "./data/example/7.gxl";
-		 //GraphCollection source, target;
-		// TODO Auto-generated method stub
-		// set the appropriate cost function
-		//Constants.costFunction = (ICostFunction)new UnlabeledCostFunction(nodeCosts, edgeCosts, alpha); // TODO 1
-		//Constants.costFunction = (ICostFunction)new MoleculesCostFunction(nodeCosts, edgeCosts); 
-		Constants.costFunction = (ICostFunction)new UniversalCostFunction(0.5); 
-		
-		 // set the appropriate edgehandler (directed or undirected)
-		Constants.edgeHandler = new UniversalEdgeHandler();//UnDirectedEdgeHandler(); 
-		
-		// source = new GraphCollection();
-		// source.setCollectionName(args[0]);
-		 
-		 
-		 //target = new GraphCollection();
-		 //target.setCollectionName(args[1]);
-		
-		XMLParser xmlParser = new XMLParser();
-		Graph g1 = null;
-		Graph g2 = null;
-		try {
-			g1 = xmlParser.parseGXL(sg1);
-			g2= xmlParser.parseGXL(sg2);
-			GraphEditDistance GED = new GraphEditDistance(g1,g2,Constants.costFunction,Constants.edgeHandler,false);
-			GED.getBestEditpath().printMe();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//source.add(g2);
-		//target.add(g1);
-	}
-	private static void t2() throws FileNotFoundException {
-		// TODO Auto-generated method stub
-		SpeedEvalTest SET = new SpeedEvalTest("gedspeedheuristic" +10 + ".txt");
-		Constants.costFunction = (ICostFunction)new UniversalCostFunction(0.5); 
-		 // set the appropriate edgehandler (directed or undirected)
-		Constants.edgeHandler = new UniversalEdgeHandler(); 
-		
-		Graph g1 = SET.SyntheticLinearGraph(10);
-	
-		
-		for(int i=0;i<10;i++){
-			Graph g2 = SET.SyntheticLinearGraph(i+1);
-			SET.StartChrono();
-			GraphEditDistance GED = new GraphEditDistance(g1,g2,Constants.costFunction,Constants.edgeHandler,false);
-			System.out.println("i="+(i+1)+"   "+GED.getBestEditpath().getTotalCosts());
-			SET.StopChrono();
-			SET.WriteElapsedTime();
-			
-		}
-		SET.CloseStream();
-	}
-*/
-	
 	
 	private static FilenameFilter gxlFileFilter = new FilenameFilter() {
 		public boolean accept(File dir, String name) {

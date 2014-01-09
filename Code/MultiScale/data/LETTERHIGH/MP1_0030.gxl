@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="MP1_0030" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>1.55359</float>
+      </attr>
+      <attr name="y">
+        <float>1.7176</float>
+      </attr>
+    </node>
+    <node id="_1">
+      <attr name="x">
+        <float>2.52608</float>
+      </attr>
+      <attr name="y">
+        <float>2.93175</float>
+      </attr>
+    </node>
+    <node id="_2">
+      <attr name="x">
+        <float>2.52407</float>
+      </attr>
+      <attr name="y">
+        <float>-0.0468974</float>
+      </attr>
+    </node>
+    <node id="_3">
+      <attr name="x">
+        <float>0.159875</float>
+      </attr>
+      <attr name="y">
+        <float>0.404737</float>
+      </attr>
+    </node>
+    <node id="_4">
+      <attr name="x">
+        <float>0.0906602</float>
+      </attr>
+      <attr name="y">
+        <float>2.34831</float>
+      </attr>
+    </node>
+    <edge id="_0-_1-0" to="_1" from="_0">
+      <attr name="distance">
+        <float>1.55560182006836</float>
+      </attr>
+    </edge>
+    <edge id="_0-_2-1" to="_2" from="_0">
+      <attr name="distance">
+        <float>2.01377320098534</float>
+      </attr>
+    </edge>
+    <edge id="_0-_4-2" to="_4" from="_0">
+      <attr name="distance">
+        <float>1.59309720476437</float>
+      </attr>
+    </edge>
+    <edge id="_1-_2-3" to="_2" from="_1">
+      <attr name="distance">
+        <float>2.97864807817687</float>
+      </attr>
+    </edge>
+    <edge id="_1-_3-4" to="_3" from="_1">
+      <attr name="distance">
+        <float>3.46189555073431</float>
+      </attr>
+    </edge>
+    <edge id="_2-_3-5" to="_3" from="_2">
+      <attr name="distance">
+        <float>2.40694653644163</float>
+      </attr>
+    </edge>
+    <edge id="_3-_4-6" to="_4" from="_3">
+      <attr name="distance">
+        <float>1.94480505317835</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

@@ -12,6 +12,8 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 	
 	/** the edges that belong to this node */
 	private LinkedList edges;
+	/** The name of communities the node belongs to */
+	private LinkedList<String> communities;
 
 
 
@@ -39,6 +41,7 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 		}
 		
 		this.edges = new LinkedList();
+		this.communities = new LinkedList<String>();
 		
 	}
 	
@@ -108,9 +111,43 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 		
 		
 	}
-
 	
+	/**
+	 * @return communities The LinkedList of communities the node belongs to
+	 */
+	public LinkedList<String> getCommunities() {
+		return communities;
+	}
 
+	/**
+	 * @return the name of the community stored at the index index the node belongs to
+	 */
+	public String getCommunity(int index) {
+		return (String) communities.get(index);
+	}
+	
+	/**
+	 * Adds the name of the community passed in parameter at the end of the list.
+	 * @param name The name of the community to add.
+	 */
+	public void addCommunity(String name) {
+		communities.push(name);
+	}
+	
+	/**
+	 * Removes the last community from the list.
+	 */
+	public void removeCommunity() {
+		communities.pop();
+	}
+
+	/**
+	 * @param communities The LinkedList of communities to set.
+	 */
+	public void setCommunities(LinkedList<String> communities) {
+		this.communities = communities;
+	}
+	
 	/**
 	 * @return   Returns the edges.
 	 * @uml.property   name="edges"

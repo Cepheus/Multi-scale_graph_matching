@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="IP1_0042" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>2.0991</float>
+      </attr>
+      <attr name="y">
+        <float>2.89909</float>
+      </attr>
+    </node>
+    <node id="_1">
+      <attr name="x">
+        <float>1.38316</float>
+      </attr>
+      <attr name="y">
+        <float>0.215286</float>
+      </attr>
+    </node>
+    <edge id="_0-_1-0" to="_1" from="_0">
+      <attr name="distance">
+        <float>2.77765620515139</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

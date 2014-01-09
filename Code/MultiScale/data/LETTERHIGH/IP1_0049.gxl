@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="IP1_0049" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>1.54014</float>
+      </attr>
+      <attr name="y">
+        <float>3.08372</float>
+      </attr>
+    </node>
+  </graph>
+</gxl>

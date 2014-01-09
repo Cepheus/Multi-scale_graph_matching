@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="MP1_0147" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>0.882344</float>
+      </attr>
+      <attr name="y">
+        <float>1.93214</float>
+      </attr>
+    </node>
+    <node id="_1">
+      <attr name="x">
+        <float>2.84143</float>
+      </attr>
+      <attr name="y">
+        <float>3.20668</float>
+      </attr>
+    </node>
+    <node id="_2">
+      <attr name="x">
+        <float>2.47301</float>
+      </attr>
+      <attr name="y">
+        <float>0.56458</float>
+      </attr>
+    </node>
+    <node id="_3">
+      <attr name="x">
+        <float>0.614823</float>
+      </attr>
+      <attr name="y">
+        <float>0.927098</float>
+      </attr>
+    </node>
+    <node id="_4">
+      <attr name="x">
+        <float>0.836508</float>
+      </attr>
+      <attr name="y">
+        <float>3.16379</float>
+      </attr>
+    </node>
+    <edge id="_0-_1-0" to="_1" from="_0">
+      <attr name="distance">
+        <float>2.33719279628275</float>
+      </attr>
+    </edge>
+    <edge id="_0-_4-1" to="_4" from="_0">
+      <attr name="distance">
+        <float>1.23250260096926</float>
+      </attr>
+    </edge>
+    <edge id="_1-_2-2" to="_2" from="_1">
+      <attr name="distance">
+        <float>2.66766296716808</float>
+      </attr>
+    </edge>
+    <edge id="_1-_4-3" to="_4" from="_1">
+      <attr name="distance">
+        <float>2.00538070654527</float>
+      </attr>
+    </edge>
+    <edge id="_2-_3-4" to="_3" from="_2">
+      <attr name="distance">
+        <float>1.8932190119722</float>
+      </attr>
+    </edge>
+    <edge id="_3-_4-5" to="_4" from="_3">
+      <attr name="distance">
+        <float>2.24765107213931</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

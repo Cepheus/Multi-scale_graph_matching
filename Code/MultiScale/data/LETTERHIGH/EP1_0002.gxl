@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="EP1_0002" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>1.95736</float>
+      </attr>
+      <attr name="y">
+        <float>2.83988</float>
+      </attr>
+    </node>
+    <node id="_1">
+      <attr name="x">
+        <float>2.25</float>
+      </attr>
+      <attr name="y">
+        <float>0.71</float>
+      </attr>
+    </node>
+    <node id="_2">
+      <attr name="x">
+        <float>0.769755</float>
+      </attr>
+      <attr name="y">
+        <float>0.744888</float>
+      </attr>
+    </node>
+    <node id="_3">
+      <attr name="x">
+        <float>0.638055</float>
+      </attr>
+      <attr name="y">
+        <float>3.24722</float>
+      </attr>
+    </node>
+    <node id="_4">
+      <attr name="x">
+        <float>0.484473</float>
+      </attr>
+      <attr name="y">
+        <float>1.65269</float>
+      </attr>
+    </node>
+    <node id="_5">
+      <attr name="x">
+        <float>1.8947</float>
+      </attr>
+      <attr name="y">
+        <float>1.73815</float>
+      </attr>
+    </node>
+    <node id="_6">
+      <attr name="x">
+        <float>0.935535</float>
+      </attr>
+      <attr name="y">
+        <float>2.34745</float>
+      </attr>
+    </node>
+    <edge id="_0-_3-0" to="_3" from="_0">
+      <attr name="distance">
+        <float>1.38075760313858</float>
+      </attr>
+    </edge>
+    <edge id="_0-_5-1" to="_5" from="_0">
+      <attr name="distance">
+        <float>1.10351042971963</float>
+      </attr>
+    </edge>
+    <edge id="_1-_2-2" to="_2" from="_1">
+      <attr name="distance">
+        <float>1.48065608179921</float>
+      </attr>
+    </edge>
+    <edge id="_1-_6-3" to="_6" from="_1">
+      <attr name="distance">
+        <float>2.09977635445421</float>
+      </attr>
+    </edge>
+    <edge id="_2-_3-4" to="_3" from="_2">
+      <attr name="distance">
+        <float>2.50579534843211</float>
+      </attr>
+    </edge>
+    <edge id="_2-_5-5" to="_5" from="_2">
+      <attr name="distance">
+        <float>1.50069005916245</float>
+      </attr>
+    </edge>
+    <edge id="_4-_5-6" to="_5" from="_4">
+      <attr name="distance">
+        <float>1.41281407238497</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

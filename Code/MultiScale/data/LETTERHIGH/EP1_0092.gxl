@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+  <graph id="EP1_0092" role="" edgemode="undirected">
+    <node id="_0">
+      <attr name="x">
+        <float>2.00552</float>
+      </attr>
+      <attr name="y">
+        <float>2.6249</float>
+      </attr>
+    </node>
+    <node id="_1">
+      <attr name="x">
+        <float>2.70719</float>
+      </attr>
+      <attr name="y">
+        <float>0.312012</float>
+      </attr>
+    </node>
+    <node id="_2">
+      <attr name="x">
+        <float>0.756694</float>
+      </attr>
+      <attr name="y">
+        <float>0.496992</float>
+      </attr>
+    </node>
+    <node id="_3">
+      <attr name="x">
+        <float>0.731731</float>
+      </attr>
+      <attr name="y">
+        <float>3.00548</float>
+      </attr>
+    </node>
+    <node id="_4">
+      <attr name="x">
+        <float>0.565033</float>
+      </attr>
+      <attr name="y">
+        <float>1.90118</float>
+      </attr>
+    </node>
+    <node id="_5">
+      <attr name="x">
+        <float>2.59451</float>
+      </attr>
+      <attr name="y">
+        <float>1.43008</float>
+      </attr>
+    </node>
+    <edge id="_0-_3-0" to="_3" from="_0">
+      <attr name="distance">
+        <float>1.32942828047285</float>
+      </attr>
+    </edge>
+    <edge id="_0-_5-1" to="_5" from="_0">
+      <attr name="distance">
+        <float>1.33210512066428</float>
+      </attr>
+    </edge>
+    <edge id="_1-_2-2" to="_2" from="_1">
+      <attr name="distance">
+        <float>1.95924787773676</float>
+      </attr>
+    </edge>
+    <edge id="_2-_3-3" to="_3" from="_2">
+      <attr name="distance">
+        <float>2.50861220548593</float>
+      </attr>
+    </edge>
+    <edge id="_3-_4-4" to="_4" from="_3">
+      <attr name="distance">
+        <float>1.11681095678902</float>
+      </attr>
+    </edge>
+    <edge id="_4-_5-5" to="_5" from="_4">
+      <attr name="distance">
+        <float>2.08343756890601</float>
+      </attr>
+    </edge>
+  </graph>
+</gxl>
