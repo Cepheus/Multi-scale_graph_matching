@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import util.CpuMonitorWindows;
+import util.Edge;
 import util.EditPath;
 import util.Graph;
 import util.ICostFunction;
@@ -257,9 +258,20 @@ public class MultiScaleGraphEditDistance {
 		
 		/** EXECUTION */
 		Graph g1;
-		g1 = graphTab[4];
+		g1 = graphTab[0];
 		Louvain louvain = new Louvain(g1, "valence");
-		
+//		for (Object o : g1.getEdges()) {
+//			Edge e = (Edge) o;
+//			System.out.println(e.getStartNode().getId()+" "+e.getEndNode().getId()+" "+e.getValue("valence"));
+//		}
+		louvain.findCommunities();
+		louvain.findCommunities();
+		for (Node node : louvain.getNodes()) {
+			System.out.println("Node "+node.getId());
+			for (int i = 0; i <= louvain.getScale(); i++) {
+				System.out.println("Scale "+i+" "+node.getCommunity(i));
+			}			
+		}
 		System.out.println("After executing the Multi Scale  Graph Edit Distance function ");	
 	}
 	

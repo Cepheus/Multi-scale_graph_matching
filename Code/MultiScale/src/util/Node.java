@@ -135,6 +135,24 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 	}
 	
 	/**
+	 * Adds the name of the community passed in parameter at position index.
+	 * @param index The position to put the community.
+	 * @param name The name of the community to add.
+	 */
+	public void addCommunity(int index, String name) {
+		communities.add(index, name);
+	}
+	
+	/**
+	 * Changes a community.
+	 * @param index The index of the community to change.
+	 * @param name The new name of the community.
+	 */
+	public void editCommunity(int index, String name) {
+		communities.set(index, name);
+	}
+	
+	/**
 	 * Removes the last community from the list.
 	 */
 	public void removeCommunity() {
