@@ -34,6 +34,7 @@ public class Louvain {
 	private double m;
 	/** The list of the nodes of the graph */
 	private LinkedHashSet<Node> nodes;
+
 	public String getKey() {
 		return key;
 	}
@@ -102,7 +103,7 @@ public class Louvain {
 
 		// We copy the community of scale to scale+1
 		for (Node i : nodes) {
-			i.addCommunity(scale+1, i.getCommunity(scale));
+			i.addCommunity(scale + 1, i.getCommunity(scale));
 		}
 		scale++;
 
@@ -112,11 +113,12 @@ public class Louvain {
 		double dQ_max = 0;
 		double dQ = 0;
 		double old_Q;
-		//do {
-			old_Q = Q;
-			for (Node i : nodes) {
-				dQ_max = 0;
-				for (Node j : nodes) {
+		// do {
+		old_Q = Q;
+		for (Node i : nodes) {
+			dQ_max = 0;
+			for (Node j : nodes) {
+				if (i != j && i.getCommunity(scale) != j.getCommunity(scale)) {
 					// We put i into the community C of j
 					old_community = i.getCommunity(scale);
 					current_community = j.getCommunity(scale);
@@ -131,13 +133,14 @@ public class Louvain {
 					// We put i back into its old community.
 					i.editCommunity(scale, old_community);
 				}
-				// We put i into the best community.
-				if (dQ_max > 0) {
-					i.editCommunity(scale, best_community);
-				}
 			}
-			computeModularity();
-		//} while (old_Q != Q);
+			// We put i into the best community.
+			if (dQ_max > 0) {
+				i.editCommunity(scale, best_community);
+			}
+		}
+		computeModularity();
+		// } while (old_Q != Q);
 		// TODO Make H from communities
 		return G;
 	}
@@ -152,7 +155,7 @@ public class Louvain {
 	 * @return The modularity gain from putting i into C.
 	 */
 	private double computeModularityGain(Node i, String C) {
-
+		
 		double sumIn = 0;
 		double sumTot = 0;
 		double ki = 0;
@@ -200,23 +203,25 @@ public class Louvain {
 		for (Node i : nodes) {
 			for (Node j : nodes) {
 				ci = i.getCommunity(scale);
-				cj = i.getCommunity(scale);
-				if (ci == cj) {
-					Aij = ki = kj = 0;
+				cj = j.getCommunity(scale);
+				if (ci == cj && i != j) {
+					Aij = Double.MIN_VALUE;
+					ki = kj = 0;
 					for (Object o : G.getEdges()) {
 						Edge e = (Edge) o;
-						if (e.getStartNode() == i || e.getEndNode() == i) 
+						if (e.getStartNode() == i || e.getEndNode() == i)
 							ki += Double.parseDouble((String) e.getValue(key));
-						if (e.getStartNode() == j || e.getEndNode() == j) 
+						if (e.getStartNode() == j || e.getEndNode() == j)
 							kj += Double.parseDouble((String) e.getValue(key));
-						if (e.getStartNode() == i && e.getEndNode() == j 
+						if (e.getStartNode() == i && e.getEndNode() == j
 								|| e.getStartNode() == j && e.getEndNode() == i)
 							Aij = Double.parseDouble((String) e.getValue(key));
 					}
-					Q += Aij - (ki*kj)/(2*m);
+					if (Aij != Double.MIN_VALUE)
+						Q += Aij - (ki * kj) / (2 * m);
 				}
 			}
 		}
-		Q = Q / (2*m);
+		Q = Q / (2 * m);
 	}
 }
