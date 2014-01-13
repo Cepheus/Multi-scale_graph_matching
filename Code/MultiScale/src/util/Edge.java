@@ -47,6 +47,10 @@ public class Edge extends GraphComponent implements  java.io.Serializable{
 		this.isDirected = isDirected;
 	}
 
+	public Edge() {
+		super();
+	}
+	
 	/**
 	 * the constructor
 	 */
@@ -60,6 +64,17 @@ public class Edge extends GraphComponent implements  java.io.Serializable{
 		this.setComponentId("-1");
 	}
 	
+	public Object clone() {
+		// Deep copy
+		Edge e = new Edge();
+		e.startNode = (Node) startNode.clone();
+		e.endNode = (Node) endNode.clone();
+		e.isInverted = isInverted;
+		e.setComponentId(getComponentId());
+		e.setNode(isNode());
+		e.setTable(getTable());
+		return e;
+	}
 	
 	/**
 	 * New constructor

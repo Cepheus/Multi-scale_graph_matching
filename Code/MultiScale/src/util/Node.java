@@ -28,6 +28,9 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 		this.isDirected = isDirected;
 	}
 
+	public Node() {
+		super();
+	}
 
 	/**
 	 * the constructor
@@ -43,6 +46,21 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 		this.edges = new LinkedList();
 		this.communities = new LinkedList<String>();
 		
+	}
+	
+	public Object clone() {
+		// Deep copy
+		Node node = new Node();
+		node.isDirected = isDirected;
+		node.setComponentId(getComponentId());
+		node.setNode(isNode());
+		node.setTable(getTable());
+		node.communities = new LinkedList<String>();
+		for (String s : communities) {
+			node.communities.add(s);
+		}
+		node.edges = new LinkedList();
+		return node;
 	}
 	
 	
