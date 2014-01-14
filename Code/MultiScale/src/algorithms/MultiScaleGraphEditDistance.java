@@ -257,15 +257,24 @@ public class MultiScaleGraphEditDistance {
 		}
 		
 		/** EXECUTION */
+		// Test Louvain
 		Graph g1;
 		g1 = graphTab[0];
 		Louvain louvain = new Louvain(g1, "valence");
 		louvain.findCommunities();
-		//louvain.findCommunities();
+		louvain.findCommunities();
 		Graph H = louvain.getGraphFromScale(louvain.getScale());
 		for (Node i : louvain.getNodesH()) {
 			System.out.println(i.getComponentId());
 		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId());
+		}
+		
+		// Test Get graph from community
+		System.out.println("Get c4");
+		H = louvain.getGraphFromCommunity("c4", louvain.getScale());
 		for (Object o : H.getEdges()) {
 			Edge e = (Edge) o;
 			System.out.println(e.getComponentId());

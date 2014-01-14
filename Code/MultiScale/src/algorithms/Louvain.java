@@ -254,7 +254,7 @@ public class Louvain {
 	}
 	
 	/**
-	 * Transform the original graph into the graph formed by the communities.
+	 * Transform the original graph into the new graph formed by the communities.
 	 * @param scale The scale which communities we take into account.
 	 * @return The newly formed graph.
 	 */
@@ -391,5 +391,37 @@ public class Louvain {
 			H.getEdges().remove(e);
 		}
 		return H;
+	}
+
+	/**
+	 * Form the subgraph formed by a community.
+	 * @param community The community from which we get the subgraph.
+	 * @param scale The scale we are working on.
+	 * @return The newly formed graph.
+	 */
+	public Graph getGraphFromCommunity(String community, int scale) {
+		
+		Graph T = (Graph) G.clone();
+		LinkedList<Edge> edges_to_remove = new LinkedList<Edge>();
+		
+		String ci, cj;
+		Node i, j;
+		Edge e;
+		for (Object o : T.getEdges()) {
+			e = (Edge) o;
+			i = e.getStartNode();
+			j = e.getEndNode();
+			ci = i.getCommunity(scale);
+			cj = j.getCommunity(scale);
+			if(!(ci.compareTo(community) == 0 && cj.compareTo(community) == 0))
+				edges_to_remove.add(e);
+		}
+		
+		while (edges_to_remove.size() > 0) {
+			e = edges_to_remove.removeFirst();
+			T.getEdges().remove(e);
+		}
+		
+		return T;
 	}
 }
