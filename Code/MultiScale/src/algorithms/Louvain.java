@@ -117,7 +117,9 @@ public class Louvain {
 		for (k = 0; k < nodes.size(); k++) {
 			Node i = (Node) nodes.toArray()[k];
 			i.addCommunity(scale + 1, i.getCommunity(scale));
-			i = (Node) nodesH.toArray()[k];
+		}
+		for (k = 0; k < nodesH.size(); k++) {
+			Node i = (Node) nodesH.toArray()[k];
 			i.addCommunity(scale + 1, i.getCommunity(scale));
 		}
 		scale++;
@@ -132,7 +134,7 @@ public class Louvain {
 		// old_Q = Q;
 		for (k = 0; k < nodes.size(); k++) {
 			Node i = (Node) nodes.toArray()[k];
-			Node iH = (Node) nodesH.toArray()[k];
+			// Node iH = (Node) nodesH.toArray()[k];
 			dQ_max = 0;
 			for (l = 0; l < nodes.size(); l++) {
 				Node j = (Node) nodes.toArray()[l];
@@ -155,16 +157,24 @@ public class Louvain {
 			// We put i into the best community.
 			if (dQ_max > 0) {
 				i.editCommunity(scale, best_community);
-				iH.editCommunity(scale, best_community);
+				// iH.editCommunity(scale, best_community);
 			}
 		}
 		computeModularity();
 		// } while (old_Q != Q);
 
+		for (Node i : nodes) {
+			for (Node j : nodesH) {
+				if (i.getId() == j.getId())
+					j.editCommunity(scale, i.getCommunity(scale));
+			}
+		}
+
 		/* We construct the new graph formed by the communities. */
 		LinkedList<Node> to_remove = new LinkedList<Node>();
 		LinkedList<Edge> to_remove_edge = new LinkedList<Edge>();
 		LinkedList<String> community_done = new LinkedList<String>();
+		LinkedList<Node> community_node = new LinkedList<Node>();
 		boolean first;
 		Edge community_edge = null;
 		String ci, cj;
@@ -178,9 +188,8 @@ public class Louvain {
 					ci = i.getCommunity(scale);
 					cj = j.getCommunity(scale);
 
-					if (i != j && ci == cj && j.getComponentId() != ci) {
+					if (i != j && ci == cj) {
 						if (!community_done.contains(ci)) {
-							i.setId(ci);
 							i.setComponentId(ci);
 							// If we found one we transform the edges to those
 							// nodes
@@ -206,6 +215,11 @@ public class Louvain {
 												e.setStartNode(i);
 											else if (e.getEndNode() == j)
 												e.setEndNode(i);
+											e.setComponentId(e.getStartNode()
+													.getComponentId()
+													+ "_<>_"
+													+ e.getEndNode()
+															.getComponentId());
 											first = false;
 										}
 										// We remove the others and add their
@@ -239,10 +253,6 @@ public class Louvain {
 										// to the new community node
 										if (first) {
 											community_edge = e;
-											if (e.getStartNode() == i)
-												e.setStartNode(i);
-											else if (e.getEndNode() == i)
-												e.setEndNode(i);
 											e.setComponentId(e.getStartNode()
 													.getComponentId()
 													+ "_<>_"
@@ -279,9 +289,11 @@ public class Louvain {
 								p++;
 							}
 							community_done.add(ci);
+							community_node.add(i);
 						}
 						// Finally we remove the node j
-						to_remove.add(j);
+						if (!community_node.contains(j))
+							to_remove.add(j);
 					}
 				}
 				l++;

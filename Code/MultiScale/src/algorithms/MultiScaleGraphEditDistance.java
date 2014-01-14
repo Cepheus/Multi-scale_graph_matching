@@ -261,7 +261,7 @@ public class MultiScaleGraphEditDistance {
 		g1 = graphTab[0];
 		Louvain louvain = new Louvain(g1, "valence");
 		Graph H = louvain.findCommunities();
-		//louvain.findCommunities();
+		//H = louvain.findCommunities();
 		for (Node i : louvain.getNodesH()) {
 			System.out.println(i.getComponentId());
 		}
