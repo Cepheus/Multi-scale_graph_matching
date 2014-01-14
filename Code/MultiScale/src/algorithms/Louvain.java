@@ -106,11 +106,9 @@ public class Louvain {
 
 	/**
 	 * Find the communities of the actual graph H and adds them into the nodes
-	 * of G
-	 * 
-	 * @return The original graph with the communities stored inside the nodes
+	 * of G.
 	 */
-	public Graph findCommunities() {
+	public void findCommunities() {
 
 		// We copy the community of scale to scale+1
 		int k, l;
@@ -169,7 +167,98 @@ public class Louvain {
 					j.editCommunity(scale, i.getCommunity(scale));
 			}
 		}
+	}
 
+	public LinkedHashSet<Node> getNodesH() {
+		return nodesH;
+	}
+
+	/**
+	 * Compute the modularity gain from putting i into C.
+	 * 
+	 * @param i
+	 *            The node we are changing its community.
+	 * @param C
+	 *            The community we are putting i into.
+	 * @return The modularity gain from putting i into C.
+	 */
+	private double computeModularityGain(Node i, String C) {
+
+		double sumIn = 0;
+		double sumTot = 0;
+		double ki = 0;
+		double kiin = 0;
+
+		for (Object o : G.getEdges()) {
+			Edge e = (Edge) o;
+			String start = e.getStartNode().getCommunity(scale);
+			String end = e.getEndNode().getCommunity(scale);
+			// Sum of the weights of the links inside the community.
+			if (start == C && start == end)
+				sumIn += Double.parseDouble((String) e.getValue(key));
+			// Sum of the weights of the links incident to the community.
+			if (start == C && end != C || start != C && end == C)
+				sumTot += Double.parseDouble((String) e.getValue(key));
+			// Sum of the weights of the links from i to nodes in C.
+			if (start == C && e.getEndNode() == i || e.getStartNode() == i
+					&& end == C)
+				kiin += Double.parseDouble((String) e.getValue(key));
+			// Sum of the weights of the edges attached to vertex i.
+			if (e.getStartNode() == i || e.getEndNode() == i)
+				ki += Double.parseDouble((String) e.getValue(key));
+		}
+
+		double dQ = 0;
+		double m2 = 2 * m;
+		// (SumIn + kiin)/2m
+		dQ = (sumIn + kiin) / m2;
+		// - ((sumTot + ki)/2m)²
+		dQ = dQ - Math.pow((sumTot + ki) / m2, 2);
+		// - [sumIn/2m - (sumTot/2m)² - (ki/2m)²]
+		dQ = dQ
+				- (sumIn / m2 - Math.pow(sumTot / m2, 2) - Math.pow(ki / m2, 2));
+
+		return dQ;
+	}
+
+	/**
+	 * Calculate the modularity.
+	 */
+	private void computeModularity() {
+		String ci, cj;
+		double ki, kj, Aij;
+		Q = 0;
+		for (Node i : nodes) {
+			for (Node j : nodes) {
+				ci = i.getCommunity(scale);
+				cj = j.getCommunity(scale);
+				if (ci == cj && i != j) {
+					Aij = Double.MIN_VALUE;
+					ki = kj = 0;
+					for (Object o : G.getEdges()) {
+						Edge e = (Edge) o;
+						if (e.getStartNode() == i || e.getEndNode() == i)
+							ki += Double.parseDouble((String) e.getValue(key));
+						if (e.getStartNode() == j || e.getEndNode() == j)
+							kj += Double.parseDouble((String) e.getValue(key));
+						if (e.getStartNode() == i && e.getEndNode() == j
+								|| e.getStartNode() == j && e.getEndNode() == i)
+							Aij = Double.parseDouble((String) e.getValue(key));
+					}
+					if (Aij != Double.MIN_VALUE)
+						Q += Aij - (ki * kj) / (2 * m);
+				}
+			}
+		}
+		Q = Q / (2 * m);
+	}
+	
+	/**
+	 * Transform the original graph into the graph formed by the communities.
+	 * @param scale The scale which communities we take into account.
+	 * @return The newly formed graph.
+	 */
+	public Graph getGraphFromScale(int scale) {
 		/* We construct the new graph formed by the communities. */
 		LinkedList<Node> to_remove = new LinkedList<Node>();
 		LinkedList<Edge> to_remove_edge = new LinkedList<Edge>();
@@ -180,8 +269,6 @@ public class Louvain {
 		String ci, cj;
 		// For each node
 		for (Node i : nodesH) {
-			// We search for another node which is in the same community.
-			l = 0;
 			first = true;
 			for (Node j : nodesH) {
 				if (!to_remove.contains(j)) {
@@ -191,9 +278,6 @@ public class Louvain {
 					if (i != j && ci == cj) {
 						if (!community_done.contains(ci)) {
 							i.setComponentId(ci);
-							// If we found one we transform the edges to those
-							// nodes
-							int p = 0;
 							for (Object o : H.getEdges()) {
 								Edge e = (Edge) o;
 								if (!to_remove_edge.contains(o)) {
@@ -286,7 +370,6 @@ public class Louvain {
 										to_remove_edge.add(e);
 									}
 								}
-								p++;
 							}
 							community_done.add(ci);
 							community_node.add(i);
@@ -296,9 +379,7 @@ public class Louvain {
 							to_remove.add(j);
 					}
 				}
-				l++;
 			}
-			k++;
 		}
 
 		while (to_remove.size() > 0) {
@@ -310,89 +391,5 @@ public class Louvain {
 			H.getEdges().remove(e);
 		}
 		return H;
-	}
-
-	public LinkedHashSet<Node> getNodesH() {
-		return nodesH;
-	}
-
-	/**
-	 * Compute the modularity gain from putting i into C.
-	 * 
-	 * @param i
-	 *            The node we are changing its community.
-	 * @param C
-	 *            The community we are putting i into.
-	 * @return The modularity gain from putting i into C.
-	 */
-	private double computeModularityGain(Node i, String C) {
-
-		double sumIn = 0;
-		double sumTot = 0;
-		double ki = 0;
-		double kiin = 0;
-
-		for (Object o : G.getEdges()) {
-			Edge e = (Edge) o;
-			String start = e.getStartNode().getCommunity(scale);
-			String end = e.getEndNode().getCommunity(scale);
-			// Sum of the weights of the links inside the community.
-			if (start == C && start == end)
-				sumIn += Double.parseDouble((String) e.getValue(key));
-			// Sum of the weights of the links incident to the community.
-			if (start == C && end != C || start != C && end == C)
-				sumTot += Double.parseDouble((String) e.getValue(key));
-			// Sum of the weights of the links from i to nodes in C.
-			if (start == C && e.getEndNode() == i || e.getStartNode() == i
-					&& end == C)
-				kiin += Double.parseDouble((String) e.getValue(key));
-			// Sum of the weights of the edges attached to vertex i.
-			if (e.getStartNode() == i || e.getEndNode() == i)
-				ki += Double.parseDouble((String) e.getValue(key));
-		}
-
-		double dQ = 0;
-		double m2 = 2 * m;
-		// (SumIn + kiin)/2m
-		dQ = (sumIn + kiin) / m2;
-		// - ((sumTot + ki)/2m)²
-		dQ = dQ - Math.pow((sumTot + ki) / m2, 2);
-		// - [sumIn/2m - (sumTot/2m)² - (ki/2m)²]
-		dQ = dQ
-				- (sumIn / m2 - Math.pow(sumTot / m2, 2) - Math.pow(ki / m2, 2));
-
-		return dQ;
-	}
-
-	/**
-	 * Calculate the modularity.
-	 */
-	private void computeModularity() {
-		String ci, cj;
-		double ki, kj, Aij;
-		Q = 0;
-		for (Node i : nodes) {
-			for (Node j : nodes) {
-				ci = i.getCommunity(scale);
-				cj = j.getCommunity(scale);
-				if (ci == cj && i != j) {
-					Aij = Double.MIN_VALUE;
-					ki = kj = 0;
-					for (Object o : G.getEdges()) {
-						Edge e = (Edge) o;
-						if (e.getStartNode() == i || e.getEndNode() == i)
-							ki += Double.parseDouble((String) e.getValue(key));
-						if (e.getStartNode() == j || e.getEndNode() == j)
-							kj += Double.parseDouble((String) e.getValue(key));
-						if (e.getStartNode() == i && e.getEndNode() == j
-								|| e.getStartNode() == j && e.getEndNode() == i)
-							Aij = Double.parseDouble((String) e.getValue(key));
-					}
-					if (Aij != Double.MIN_VALUE)
-						Q += Aij - (ki * kj) / (2 * m);
-				}
-			}
-		}
-		Q = Q / (2 * m);
 	}
 }
