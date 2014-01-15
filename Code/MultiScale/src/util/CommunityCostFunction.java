@@ -1,5 +1,6 @@
 package util;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -63,8 +64,7 @@ public class CommunityCostFunction implements ICostFunction {
 	 *            The edge handler.
 	 */
 	public CommunityCostFunction(double nodeCost, double edgeCost, String key,
-			Graph G1, Graph G2,
-			IEdgeHandler edgehandler) {
+			Graph G1, Graph G2, IEdgeHandler edgehandler) {
 		this.nodeCost = nodeCost;
 		this.edgeCost = edgeCost;
 		this.key = key;
@@ -75,46 +75,40 @@ public class CommunityCostFunction implements ICostFunction {
 
 	@Override
 	public double getCosts(GraphComponent start, GraphComponent end) {
-		
+
 		Graph H1, H2;
-		
-		if (start.isNode() || end.isNode()) {
+		if (start.isNode() && end.isNode()) {
 			Node start_node = (Node) start;
 			Node end_node = (Node) end;
 			// G1 and G2 are communities
-			if(start_node.isCommunity() && end_node.isCommunity()) {
-				H1 = G1.getGraphFromCommunity(start_node.getComponentId(), start_node.getScale());
-				H1 = H1.getGraphFromScale(start_node.getScale()-1, key);
-				
-				H2 = G2.getGraphFromCommunity(end_node.getComponentId(), end_node.getScale());
-				H2 = H2.getGraphFromScale(end_node.getScale()-1, key);
-				
-				GraphEditDistance GED = new GraphEditDistance(H1, H2, this, edgehandler, false);
+			if (start_node.isCommunity() && end_node.isCommunity()) {
+				H1 = G1.getGraphFromCommunity(start_node.getComponentId(),
+						start_node.getScale());
+				H1 = H1.getGraphFromScale(start_node.getScale() - 1, key);
+
+				H2 = G2.getGraphFromCommunity(end_node.getComponentId(),
+						end_node.getScale());
+				H2 = H2.getGraphFromScale(end_node.getScale() - 1, key);
+
+				GraphEditDistance GED = new GraphEditDistance(H1, H2, this,
+						edgehandler, false);
 				return GED.getBestEditpath().getTotalCosts();
-			}
-			else if (start_node.isCommunity()) {
-				H1 = G1.getGraphFromCommunity(start_node.getComponentId(), start_node.getScale());
-				H1 = H1.getGraphFromScale(start_node.getScale()-1, key);
-				
-				H2 = new Graph();
-				H2.add(end_node);
-				
-				GraphEditDistance GED = new GraphEditDistance(H1, H2, this, edgehandler, false);
-				return GED.getBestEditpath().getTotalCosts();
-			}
-			else if (end_node.isCommunity()) {
-				H1 = new Graph();
-				H1.add(start_node);
-				
-				H2 = G2.getGraphFromCommunity(end_node.getComponentId(), end_node.getScale());
-				H2 = H2.getGraphFromScale(end_node.getScale()-1, key);
-								
-				GraphEditDistance GED = new GraphEditDistance(H1, H2, this, edgehandler, false);
-				return GED.getBestEditpath().getTotalCosts();
+			} else if (start_node.isCommunity()) {
+				H1 = G1.getGraphFromCommunity(start_node.getComponentId(),
+						start_node.getScale());
+				H1 = H1.getGraphFromScale(start_node.getScale() - 1, key);
+
+				return H1.size() * nodeCost + H1.getEdges().size() * edgeCost;
+			} else if (end_node.isCommunity()) {
+				H2 = G2.getGraphFromCommunity(end_node.getComponentId(),
+						end_node.getScale());
+				H2 = H2.getGraphFromScale(end_node.getScale() - 1, key);
+
+				return H2.size() * nodeCost + H2.getEdges().size() * edgeCost;
 			}
 			return nodeCost;
 		}
-		
+
 		return edgeCost;
 	}
 

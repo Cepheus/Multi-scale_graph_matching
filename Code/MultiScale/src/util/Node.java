@@ -30,7 +30,7 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 	}
 	
 	public boolean isCommunity() {
-		return isCommunity();
+		return isCommunity;
 	}
 	
 	public int getScale() {
@@ -45,7 +45,7 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 	 * Declare the node as a community.
 	 * @param scale The scale of the community.
 	 */
-	public void isCommunity(int scale) {
+	public void setIsCommunity(int scale) {
 		this.isCommunity = true;
 		this.scale = scale;
 	}
@@ -77,7 +77,7 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 		node.setComponentId(getComponentId());
 		node.setNode(isNode());
 		node.setTable(getTable());
-		node.isCommunity(scale);
+		//node.isCommunity(scale);
 		node.communities = new LinkedList<String>();
 		for (String s : communities) {
 			node.communities.add(s);

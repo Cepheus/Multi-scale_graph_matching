@@ -240,7 +240,7 @@ public class Graph extends LinkedList {
 							}
 							community_done.add(ci);
 							community_node.add(i);
-							i.isCommunity(scale);
+							i.setIsCommunity(scale);
 						}
 						// Finally we remove the node j
 						if (!community_node.contains(j))

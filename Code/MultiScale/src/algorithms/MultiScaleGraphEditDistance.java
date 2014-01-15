@@ -94,8 +94,6 @@ public class MultiScaleGraphEditDistance {
 		System.out
 				.println("Before executing the Multi Scale Graph Edit Distance function");
 
-		Constants.edgeHandler = new UnDirectedEdgeHandler();
-
 		/** PARSING */
 		int nbGraphs = 0;
 		File repertoire = new File("./data/test");
@@ -116,15 +114,18 @@ public class MultiScaleGraphEditDistance {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+ 
+		Constants.edgeHandler = new UnDirectedEdgeHandler();
 		/** EXECUTION */
 		 Graph G1, G2;
 		 G1 = graphTab[0];
-		 G2 = graphTab[0];
+		 G2 = graphTab[1];
+		 
+//		 Constants.costFunction = (ICostFunction)new UnlabeledCostFunction(1, 1, 1);
+//		 GraphEditDistance GED = new GraphEditDistance(G1, G2, Constants.costFunction, Constants.edgeHandler, false);
+//		 System.out.println(GED.getBestEditpath().getTotalCosts());
 		
-		 MultiScaleGraphEditDistance MultiScaleGED = new
-		 MultiScaleGraphEditDistance(
-		 G1, G2, "valence", Constants.edgeHandler, false);
+		 MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(G1, G2, "valence", Constants.edgeHandler, false);
 		 System.out.println(MultiScaleGED.getBestEditpath().getTotalCosts());
 
 		/** TESTS */
@@ -137,57 +138,14 @@ public class MultiScaleGraphEditDistance {
 //		do {
 //			Q = louvain.getQ();
 //			louvain.findCommunities();
-//			System.out.println("GRAPH FROM SCALE " + louvain.getScale());
-//			H = G.getGraphFromScale(louvain.getScale(), "valence");
-//			for (Object o : G) {
-//				Node node = (Node) o;
-//				System.out.println(node.getComponentId() + " "
-//						+ node.getCommunity(louvain.getScale()));
-//			}
-//			for (Object o : H.getEdges()) {
-//				Edge e = (Edge) o;
-//				System.out.println(e.getComponentId() + " "
-//						+ e.getTable().get("valence"));
-//			}
-//			System.out.println("Q = " + louvain.getQ());
 //		} while(Q != louvain.getQ());
-//
+//		
 //		H = G.getGraphFromScale(G.getScaleMax(), "valence");
-//		System.out.println("Graph Scale " + H.getScale());
-//		for (Object o : H) {
-//			Node node = (Node) o;
-//			System.out.println(node.getComponentId() + " " + node.getScale());
+//		for (Object object : H) {
+//			Node n = (Node) object;
+//			System.out.println(n.getComponentId() + " " + n.isCommunity());
 //		}
-//		for (Object o : H.getEdges()) {
-//			Edge e = (Edge) o;
-//			System.out.println(e.getComponentId() + " "
-//					+ e.getTable().get("valence"));
-//		}
-//
-//		// Test Get graph from community
-//		System.out.println("Get c5");
-//		H = G.getGraphFromCommunity("c5", louvain.getScale());
-//		for (Object o : H) {
-//			Node e = (Node) o;
-//			System.out.println(e.getComponentId());
-//		}
-//		for (Object o : H.getEdges()) {
-//			Edge e = (Edge) o;
-//			System.out.println(e.getComponentId());
-//		}
-//
-//		System.out.println("Graph from scale " + louvain.getScale());
-//		H = H.getGraphFromScale(louvain.getScale() - 1, "valence");
-//		for (Object o : H) {
-//			Node node = (Node) o;
-//			System.out.println(node.getComponentId() + " " + node.getScale());
-//		}
-//		for (Object o : H.getEdges()) {
-//			Edge e = (Edge) o;
-//			System.out.println(e.getComponentId() + " "
-//					+ e.getTable().get("valence"));
-//		}
-
+		
 	}
 
 	private EditPath getBestEditpath() {
