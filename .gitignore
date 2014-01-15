@@ -4,6 +4,8 @@ Code/MultiScale/bin/*
 Code/MultiScale/lib/*
 Code/MultiScale/res/*
 build.properties
+Code/MultiScale/data/*
+data/*
 
 #################
 ## Latex

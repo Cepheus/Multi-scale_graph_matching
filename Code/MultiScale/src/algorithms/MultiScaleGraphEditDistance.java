@@ -87,16 +87,16 @@ public class MultiScaleGraphEditDistance {
 
 	/**
 	 * @param args
-	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 
 		System.out
 				.println("Before executing the Multi Scale Graph Edit Distance function");
 
 		/** PARSING */
 		int nbGraphs = 0;
-		File repertoire = new File("./data/test");
+		File repertoire = new File("./data/LETTERHIGH");
 		if (!repertoire.exists()) {
 			System.out.println("Le répertoire n'existe pas");
 		}
@@ -114,38 +114,63 @@ public class MultiScaleGraphEditDistance {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
- 
-		Constants.edgeHandler = new UnDirectedEdgeHandler();
+
+		// Constants.edgeHandler = new UnDirectedEdgeHandler();
 		/** EXECUTION */
-		 Graph G1, G2;
-		 G1 = graphTab[0];
-		 G2 = graphTab[1];
-		 
-//		 Constants.costFunction = (ICostFunction)new UnlabeledCostFunction(1, 1, 1);
-//		 GraphEditDistance GED = new GraphEditDistance(G1, G2, Constants.costFunction, Constants.edgeHandler, false);
-//		 System.out.println(GED.getBestEditpath().getTotalCosts());
-		
-		 MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(G1, G2, "valence", Constants.edgeHandler, false);
-		 System.out.println(MultiScaleGED.getBestEditpath().getTotalCosts());
+		Graph G1, G2;
+		SpeedEvalTest SET = new SpeedEvalTest("tmp.csv");
+		FileWriter fw = new FileWriter(
+				MultiScaleGraphEditDistance.class.getName() + ".csv", false);
+		BufferedWriter output = new BufferedWriter(fw);
+		output.write("Graph1;Graph2;Cout;Temps(ms)\n");
+		for (int i = 0; i < nbGraphs; i++) {
+			G1 = graphTab[i];
+			for (int j = i; j < nbGraphs; j++) {
+				G2 = graphTab[j];
+				System.out.println(i + " " + j + " on "+nbGraphs);
+				// Constants.costFunction = (ICostFunction) new
+				// UnlabeledCostFunction(
+				// 1, 1, 1);
+				// GraphEditDistance GED = new GraphEditDistance(G1, G2,
+				// Constants.costFunction, Constants.edgeHandler, false);
+				// System.out.println(GED.getBestEditpath().getTotalCosts());
+
+				output.write(G1.getId() + ";" + G2.getId());
+				SET.StartChrono();
+
+				MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(
+						G1, G2, "distance", Constants.edgeHandler, false);
+
+				output.write(";"
+						+ MultiScaleGED.getBestEditpath().getTotalCosts());
+				SET.StopChrono();
+				output.write(";" + SET.ElapsedTimeToString());
+				output.write("\n");
+			}
+		}
+		output.flush();
+		output.close();
 
 		/** TESTS */
 		// Test Louvain
-//		Graph G, H;
-//		G = graphTab[0];
-//		Louvain louvain = new Louvain(G, "valence");
-//		
-//		double Q;
-//		do {
-//			Q = louvain.getQ();
-//			louvain.findCommunities();
-//		} while(Q != louvain.getQ());
-//		
-//		H = G.getGraphFromScale(G.getScaleMax(), "valence");
-//		for (Object object : H) {
-//			Node n = (Node) object;
-//			System.out.println(n.getComponentId() + " " + n.isCommunity());
-//		}
-		
+		// Graph G, H;
+		// G = graphTab[0];
+		// Louvain louvain = new Louvain(G, "valence");
+		//
+		// double Q;
+		// do {
+		// Q = louvain.getQ();
+		// louvain.findCommunities();
+		// } while(Q != louvain.getQ());
+		//
+		// H = G.getGraphFromScale(G.getScaleMax(), "valence");
+		// for (Object object : H) {
+		// Node n = (Node) object;
+		// System.out.println(n.getComponentId() + " " + n.isCommunity());
+		// }
+
+		System.out
+				.println("After executing the Multi Scale Graph Edit Distance function");
 	}
 
 	private EditPath getBestEditpath() {
