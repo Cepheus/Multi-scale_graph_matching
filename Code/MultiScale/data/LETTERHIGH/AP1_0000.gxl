@@ -1,5 +1,6 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<gxl xmlns:xlink=" http://www.w3.org/1999/xlink">
+<?xml version="1.0"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl>
   <graph id="AP1_0000" role="" edgemode="undirected">
     <node id="_0">
       <attr name="x">

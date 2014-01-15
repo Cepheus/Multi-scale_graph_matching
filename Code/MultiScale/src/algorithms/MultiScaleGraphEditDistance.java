@@ -62,14 +62,14 @@ public class MultiScaleGraphEditDistance {
 		do {
 			Q = L1.getQ();
 			L1.findCommunities();
-		} while (Q != L1.getQ());
+		} while (Q < L1.getQ());
 		Louvain L2 = new Louvain(G2, key);
 
 		// We find all the communities.
 		do {
 			Q = L2.getQ();
 			L2.findCommunities();
-		} while (Q != L2.getQ());
+		} while (Q < L2.getQ());
 
 		// We create the cost function with the original graphs.
 		Constants.costFunction = new CommunityCostFunction(1, 1, key, G1, G2,
@@ -115,7 +115,7 @@ public class MultiScaleGraphEditDistance {
 			e.printStackTrace();
 		}
 
-		// Constants.edgeHandler = new UnDirectedEdgeHandler();
+		Constants.edgeHandler = new UnDirectedEdgeHandler();
 		/** EXECUTION */
 		Graph G1, G2;
 		SpeedEvalTest SET = new SpeedEvalTest("tmp.csv");
@@ -127,28 +127,28 @@ public class MultiScaleGraphEditDistance {
 			G1 = graphTab[i];
 			for (int j = i; j < nbGraphs; j++) {
 				G2 = graphTab[j];
-				System.out.println(i + " " + j + " on "+nbGraphs);
-				// Constants.costFunction = (ICostFunction) new
-				// UnlabeledCostFunction(
-				// 1, 1, 1);
-				// GraphEditDistance GED = new GraphEditDistance(G1, G2,
-				// Constants.costFunction, Constants.edgeHandler, false);
-				// System.out.println(GED.getBestEditpath().getTotalCosts());
+				System.out.println(i + " " + j + " on " + nbGraphs);
 
 				output.write(G1.getId() + ";" + G2.getId());
 				SET.StartChrono();
+				
+//				Constants.costFunction = (ICostFunction) new UnlabeledCostFunction(
+//						1, 1, 1);
+//				GraphEditDistance GED = new GraphEditDistance(G1, G2,
+//						Constants.costFunction, Constants.edgeHandler, false);
+//				output.write(";" + GED.getBestEditpath().getTotalCosts());
 
 				MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(
 						G1, G2, "distance", Constants.edgeHandler, false);
-
 				output.write(";"
 						+ MultiScaleGED.getBestEditpath().getTotalCosts());
+				
 				SET.StopChrono();
 				output.write(";" + SET.ElapsedTimeToString());
 				output.write("\n");
+				output.flush();
 			}
 		}
-		output.flush();
 		output.close();
 
 		/** TESTS */
