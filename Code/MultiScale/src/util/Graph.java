@@ -51,6 +51,9 @@ public class Graph extends LinkedList {
 				nodes.put(key, e.getEndNode());
 			H.edges.add(e);
 		}
+		for (Node node : nodes.values()) {
+			H.add(node);
+		}
 		return H;
 	}
 
@@ -116,5 +119,170 @@ public class Graph extends LinkedList {
 			nodes += "\n";
 		}
 		return nodes;
+	}
+	
+	/**
+	 * Transform the original graph into the new graph formed by the
+	 * communities.
+	 * 
+	 * @param scale
+	 *            The scale which communities we take into account.
+	 * @param key
+	 *            The key of value to be used on the edges. 				  
+	 * @return The newly formed graph.
+	 */
+	public Graph getGraphFromScale(int scale, String key) {
+		Graph H = (Graph)this.clone();
+		/* We construct the new graph formed by the communities. */
+		LinkedList<Node> to_remove = new LinkedList<Node>();
+		LinkedList<Edge> to_remove_edge = new LinkedList<Edge>();
+		LinkedList<String> community_done = new LinkedList<String>();
+		LinkedList<Node> community_node = new LinkedList<Node>();
+		boolean first;
+		Edge community_edge = null;
+		String ci, cj;
+		// For each node
+		for (Object oi : H) {
+			first = true;
+			Node i = (Node) oi;
+			for (Object oj : H) {
+				Node j = (Node) oj;
+				if (!to_remove.contains(j)) {
+					ci = i.getCommunity(scale);
+					cj = j.getCommunity(scale);
+
+					if (i != j && ci.compareTo(cj) == 0) {
+						if (!community_done.contains(ci)) {
+							i.setComponentId(ci);
+							for (Object o : H.getEdges()) {
+								Edge e = (Edge) o;
+								Node start = e.getStartNode();
+								Node end = e.getEndNode();
+								if (!to_remove_edge.contains(e)) {
+									// If the edge goes into the community
+									if (start.getCommunity(scale).compareTo(ci) != 0
+											&& end.getCommunity(scale).compareTo(ci) == 0
+											|| start.getCommunity(scale).compareTo(ci) == 0
+											&& end.getCommunity(scale).compareTo(ci) != 0) {
+										// We change the first edge we find and
+										// make
+										// it
+										// go
+										// to the new community node
+										if (first) {
+											community_edge = e;
+											if (e.getStartNode()
+													.getCommunity(scale)
+													.compareTo(ci) == 0)
+												e.setStartNode(i);
+											else if (e.getEndNode()
+													.getCommunity(scale)
+													.compareTo(ci) == 0)
+												e.setEndNode(i);
+											e.setComponentId(e.getStartNode()
+													.getComponentId()
+													+ "_<>_"
+													+ e.getEndNode()
+															.getComponentId());
+											first = false;
+										}
+										// We remove the others and add their
+										// value
+										// to
+										// the
+										// first edge we kept
+										else {
+											Double value = Double
+													.parseDouble((String) community_edge
+															.getValue(key));
+											value += Double
+													.parseDouble((String) e
+															.getValue(key));
+											community_edge.put(key,
+													value.toString());
+											to_remove_edge.add(e);
+										}
+
+									}
+									// If the edge is inside the community we
+									// remove
+									// it
+									if (e.getStartNode().getCommunity(scale)
+											.compareTo(ci) == 0
+											&& e.getEndNode()
+													.getCommunity(scale)
+													.compareTo(ci) == 0) {
+										to_remove_edge.add(e);
+									}
+								}
+							}
+							community_done.add(ci);
+							community_node.add(i);
+							i.isCommunity(true);
+						}
+						// Finally we remove the node j
+						if (!community_node.contains(j))
+							to_remove.add(j);
+					}
+				}
+			}
+		}
+
+		while (to_remove.size() > 0) {
+			Node i = to_remove.removeFirst();
+			H.remove(i);
+		}
+		while (to_remove_edge.size() > 0) {
+			Edge e = to_remove_edge.removeFirst();
+			H.getEdges().remove(e);
+		}
+		return H;
+	}
+
+	/**
+	 * Form the subgraph formed by a community.
+	 * 
+	 * @param community
+	 *            The community from which we get the subgraph.
+	 * @param scale
+	 *            The scale we are working on.
+	 * @return The newly formed graph.
+	 */
+	public Graph getGraphFromCommunity(String community, int scale) {
+
+		Graph T = (Graph) this.clone();
+		LinkedList<Edge> edges_to_remove = new LinkedList<Edge>();
+		LinkedList<Node> nodes_to_remove = new LinkedList<Node>();
+
+		String ci, cj;
+		Node i, j;
+		Edge e;
+		for (Object o : T.getEdges()) {
+			e = (Edge) o;
+			i = e.getStartNode();
+			j = e.getEndNode();
+			ci = i.getCommunity(scale);
+			cj = j.getCommunity(scale);
+			if (!(ci.compareTo(community) == 0 && cj.compareTo(community) == 0))
+				edges_to_remove.add(e);
+		}
+
+		for (Object o : T) {
+			Node node = (Node) o;
+			if (node.getCommunity(scale).compareTo(community) != 0)
+				nodes_to_remove.add(node);
+		}
+
+		while (edges_to_remove.size() > 0) {
+			e = edges_to_remove.removeFirst();
+			T.getEdges().remove(e);
+		}
+
+		while (nodes_to_remove.size() > 0) {
+			Node n = nodes_to_remove.removeFirst();
+			T.remove(n);
+		}
+
+		return T;
 	}
 }

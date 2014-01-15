@@ -298,58 +298,71 @@ public class MultiScaleGraphEditDistance {
 		}
 
 		/** EXECUTION */
-		Graph G1, G2;
-		G1 = graphTab[0];
-		G2 = graphTab[0];
-		Louvain louvain = new Louvain(G1, "valence");
-		Constants.costFunction = (ICostFunction) new CommunityCostFunction(1,
-				1, "valence", louvain, G2, Constants.edgeHandler);
-		double Q;
-		do {
-			louvain.findCommunities();
-			Q = louvain.getQ();
-		} while (Q != louvain.getQ());
-		
-		G1 = louvain.getGraphFromScale(louvain.getScale());
-		
-		System.out.println("G1");
-		for (Object o : G1.getEdges()) {
-			Edge e = (Edge) o;
-			System.out.println(e.getComponentId());
-		}
-		
-		System.out.println("G2");
-		for (Object o : G2.getEdges()) {
-			Edge e = (Edge) o;
-			System.out.println(e.getComponentId());
-		}
-		
-		
-		MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(
-				louvain.getGraphFromScale(louvain.getScale()), G2, Constants.costFunction, Constants.edgeHandler, false);
-		System.out.println(MultiScaleGED.getBestEditpath().toString());
+		// Graph G1, G2;
+		// G1 = graphTab[0];
+		// G2 = graphTab[0];
+		// Louvain louvain = new Louvain(G1, "valence");
+		// Constants.costFunction = (ICostFunction) new CommunityCostFunction(1,
+		// 1, "valence", louvain, G2, Constants.edgeHandler);
+		// double Q;
+		// do {
+		// louvain.findCommunities();
+		// Q = louvain.getQ();
+		// } while (Q != louvain.getQ());
+		//
+		// G1 = louvain.getGraphFromScale(louvain.getScale());
+		//
+		// System.out.println("G1");
+		// for (Object o : G1.getEdges()) {
+		// Edge e = (Edge) o;
+		// System.out.println(e.getComponentId());
+		// }
+		//
+		// System.out.println("G2");
+		// for (Object o : G2.getEdges()) {
+		// Edge e = (Edge) o;
+		// System.out.println(e.getComponentId());
+		// }
+		//
+
+		// MultiScaleGraphEditDistance MultiScaleGED = new
+		// MultiScaleGraphEditDistance(
+		// louvain.getGraphFromScale(louvain.getScale()), G2,
+		// Constants.costFunction, Constants.edgeHandler, false);
+		// System.out.println(MultiScaleGED.getBestEditpath().toString());
 
 		/** TESTS */
 		// Test Louvain
-		/*
-		 * Graph g1; g1 = graphTab[0]; Louvain louvain = new Louvain(g1,
-		 * "valence"); louvain.findCommunities(); louvain.findCommunities();
-		 * Graph H = louvain.getGraphFromScale(louvain.getScale()); for (Node i
-		 * : louvain.getNodesH()) { System.out.println(i.getComponentId()); }
-		 * for (Object o : H.getEdges()) { Edge e = (Edge) o;
-		 * System.out.println(e.getComponentId()); }
-		 * 
-		 * // Test Get graph from community System.out.println("Get c4"); H =
-		 * louvain.getGraphFromCommunity("c4", louvain.getScale()); for (Object
-		 * o : H.getEdges()) { Edge e = (Edge) o;
-		 * System.out.println(e.getComponentId()); } // for (Node node :
-		 * louvain.getNodes()) { // System.out.println("Node "+node.getId() +
-		 * " " + node.getCommunity(1)); // for (int i = 0; i <=
-		 * louvain.getScale(); i++) { //
-		 * System.out.println("Scale "+i+" "+node.getCommunity(i)); // } // }
-		 */
-		System.out
-				.println("After executing the Multi Scale  Graph Edit Distance function ");
+		Graph G, H;
+		G = graphTab[0];
+		Louvain louvain = new Louvain(G, "valence");
+		louvain.findCommunities();
+		louvain.findCommunities();
+
+		// Test Get graph from community
+		System.out.println("Get c5");
+		H = G.getGraphFromCommunity("c5", louvain.getScale());
+		for (Object o : H) {
+			Node e = (Node) o;
+			System.out.println(e.getComponentId());
+		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId());
+		}
+
+		System.out.println("Graph from scale " + louvain.getScale());
+		H = H.getGraphFromScale(louvain.getScale()-1, "valence");
+		for (Object o : H) {
+			Node node = (Node) o;
+			System.out.println(node.getComponentId());
+		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId() + " "
+					+ e.getTable().get("valence"));
+		}
+
 	}
 
 	private static FilenameFilter gxlFileFilter = new FilenameFilter() {

@@ -34,10 +34,6 @@ public class Louvain {
 	private double Q;
 	/** Sum of the weights of all the links in the graph */
 	private double m;
-	/** The list of the nodes of the graph */
-	private LinkedHashSet<Node> nodes;
-	/** The list of the nodes of the graph H */
-	private LinkedHashSet<Node> nodesH;
 
 	public String getKey() {
 		return key;
@@ -46,17 +42,13 @@ public class Louvain {
 	public int getScale() {
 		return scale;
 	}
-	
+
 	public void setScale(int scale) {
 		this.scale = scale;
 	}
 
 	public double getQ() {
 		return Q;
-	}
-
-	public LinkedHashSet<Node> getNodes() {
-		return nodes;
 	}
 
 	public String getCommunityPrefix() {
@@ -76,23 +68,20 @@ public class Louvain {
 	 */
 	public Louvain(Graph G, String key) {
 		Constants.edgeHandler = new UnDirectedEdgeHandler();
-		nodes = new LinkedHashSet<Node>();
-		nodesH = new LinkedHashSet<Node>();
 		communityNumber = 0;
 		m = 0;
 		scale = 0;
 		this.key = key;
-		/* Construction of the list of nodes */
+
+		/* We compute m the sum of all the weights of the edges of the graph */
 		for (Object o : G.getEdges()) {
 			Edge e = (Edge) o;
-			nodes.add(e.getStartNode());
-			nodes.add(e.getEndNode());
-			/* We compute m the sum of all the weights of the edges of the graph */
 			m += Double.valueOf(e.getValue(key).toString());
 		}
 
 		/* Setting the initial communities of the nodes */
-		for (Node node : nodes) {
+		for (Object o : G) {
+			Node node = (Node) o;
 			node.addCommunity(communityPrefix + communityNumber);
 			communityNumber++;
 		}
@@ -101,11 +90,6 @@ public class Louvain {
 
 		this.G = G;
 		H = (Graph) G.clone();
-		for (Object o : H.getEdges()) {
-			Edge e = (Edge) o;
-			nodesH.add(e.getStartNode());
-			nodesH.add(e.getEndNode());
-		}
 	}
 
 	/**
@@ -115,13 +99,12 @@ public class Louvain {
 	public void findCommunities() {
 
 		// We copy the community of scale to scale+1
-		int k, l;
-		for (k = 0; k < nodes.size(); k++) {
-			Node i = (Node) nodes.toArray()[k];
+		for (Object o : G) {
+			Node i = (Node) o;
 			i.addCommunity(scale + 1, i.getCommunity(scale));
 		}
-		for (k = 0; k < nodesH.size(); k++) {
-			Node i = (Node) nodesH.toArray()[k];
+		for (Object o : H) {
+			Node i = (Node) o;
 			i.addCommunity(scale + 1, i.getCommunity(scale));
 		}
 		scale++;
@@ -134,12 +117,12 @@ public class Louvain {
 		// double old_Q;
 		// do {
 		// old_Q = Q;
-		for (k = 0; k < nodes.size(); k++) {
-			Node i = (Node) nodes.toArray()[k];
+		for (Object oi : G) {
+			Node i = (Node) oi;
 			// Node iH = (Node) nodesH.toArray()[k];
 			dQ_max = 0;
-			for (l = 0; l < nodes.size(); l++) {
-				Node j = (Node) nodes.toArray()[l];
+			for (Object oj : G) {
+				Node j = (Node) oj;
 				if (i != j && i.getCommunity(scale) != j.getCommunity(scale)) {
 					// We put i into the community C of j
 					old_community = i.getCommunity(scale);
@@ -165,16 +148,14 @@ public class Louvain {
 		computeModularity();
 		// } while (old_Q != Q);
 
-		for (Node i : nodes) {
-			for (Node j : nodesH) {
+		for (Object oi : G) {
+			Node i = (Node) oi;
+			for (Object oj : H) {
+				Node j = (Node) oj;
 				if (i.getId() == j.getId())
 					j.editCommunity(scale, i.getCommunity(scale));
 			}
 		}
-	}
-
-	public LinkedHashSet<Node> getNodesH() {
-		return nodesH;
 	}
 
 	/**
@@ -232,8 +213,10 @@ public class Louvain {
 		String ci, cj;
 		double ki, kj, Aij;
 		Q = 0;
-		for (Node i : nodes) {
-			for (Node j : nodes) {
+		for (Object oi : G) {
+			Node i = (Node) oi;
+			for (Object oj : G) {
+				Node j = (Node) oj;
 				ci = i.getCommunity(scale);
 				cj = j.getCommunity(scale);
 				if (ci == cj && i != j) {
@@ -256,14 +239,17 @@ public class Louvain {
 		}
 		Q = Q / (2 * m);
 	}
-	
+
 	/**
-	 * Transform the original graph into the new graph formed by the communities.
-	 * @param scale The scale which communities we take into account.
+	 * Transform the original graph into the new graph formed by the
+	 * communities.
+	 * 
+	 * @param scale
+	 *            The scale which communities we take into account.
 	 * @return The newly formed graph.
 	 */
-	public Graph getGraphFromScale(int scale) {
-		/* We construct the new graph formed by the communities. */
+	/*public Graph getGraphFromScale(int scale) {
+		// We construct the new graph formed by the communities.
 		LinkedList<Node> to_remove = new LinkedList<Node>();
 		LinkedList<Edge> to_remove_edge = new LinkedList<Edge>();
 		LinkedList<String> community_done = new LinkedList<String>();
@@ -272,26 +258,28 @@ public class Louvain {
 		Edge community_edge = null;
 		String ci, cj;
 		// For each node
-		for (Node i : nodesH) {
+		for (Object oi : H) {
 			first = true;
-			for (Node j : nodesH) {
+			Node i = (Node) oi;
+			for (Object oj : H) {
+				Node j = (Node) oj;
 				if (!to_remove.contains(j)) {
 					ci = i.getCommunity(scale);
 					cj = j.getCommunity(scale);
 
-					if (i != j && ci == cj) {
+					if (i != j && ci.compareTo(cj) == 0) {
 						if (!community_done.contains(ci)) {
 							i.setComponentId(ci);
 							for (Object o : H.getEdges()) {
 								Edge e = (Edge) o;
-								if (!to_remove_edge.contains(o)) {
-									// If the edge goes to node j
-									if (e.getStartNode() == j
-											&& e.getEndNode().getCommunity(
-													scale) != ci
-											|| e.getEndNode() == j
-											&& e.getStartNode().getCommunity(
-													scale) != ci) {
+								Node start = e.getStartNode();
+								Node end = e.getEndNode();
+								if (!to_remove_edge.contains(e)) {
+									// If the edge goes into the community
+									if (start.getCommunity(scale).compareTo(ci) != 0
+											&& end.getCommunity(scale).compareTo(ci) == 0
+											|| start.getCommunity(scale).compareTo(ci) == 0
+											&& end.getCommunity(scale).compareTo(ci) != 0) {
 										// We change the first edge we find and
 										// make
 										// it
@@ -299,9 +287,13 @@ public class Louvain {
 										// to the new community node
 										if (first) {
 											community_edge = e;
-											if (e.getStartNode() == j)
+											if (e.getStartNode()
+													.getCommunity(scale)
+													.compareTo(ci) == 0)
 												e.setStartNode(i);
-											else if (e.getEndNode() == j)
+											else if (e.getEndNode()
+													.getCommunity(scale)
+													.compareTo(ci) == 0)
 												e.setEndNode(i);
 											e.setComponentId(e.getStartNode()
 													.getComponentId()
@@ -326,51 +318,16 @@ public class Louvain {
 													value.toString());
 											to_remove_edge.add(e);
 										}
+
 									}
-									// If the edge goes to i
-									else if (e.getStartNode() == i
-											&& e.getEndNode().getCommunity(
-													scale) != ci
-											|| e.getEndNode() == i
-											&& e.getStartNode().getCommunity(
-													scale) != ci) {
-										// We change the first edge we find and
-										// make
-										// it
-										// go
-										// to the new community node
-										if (first) {
-											community_edge = e;
-											e.setComponentId(e.getStartNode()
-													.getComponentId()
-													+ "_<>_"
-													+ e.getEndNode()
-															.getComponentId());
-											first = false;
-										}
-										// We remove the others and add their
-										// value
-										// to
-										// the
-										// first edge we kept
-										else {
-											Double value = Double
-													.parseDouble((String) community_edge
-															.getValue(key));
-											value += Double
-													.parseDouble((String) e
-															.getValue(key));
-											community_edge.put(key,
-													value.toString());
-											to_remove_edge.add(e);
-										}
-									}
-									// If the node is inside the community we
+									// If the edge is inside the community we
 									// remove
 									// it
-									if (e.getStartNode().getCommunity(scale) == ci
-											&& e.getEndNode().getCommunity(
-													scale) == ci) {
+									if (e.getStartNode().getCommunity(scale)
+											.compareTo(ci) == 0
+											&& e.getEndNode()
+													.getCommunity(scale)
+													.compareTo(ci) == 0) {
 										to_remove_edge.add(e);
 									}
 								}
@@ -389,26 +346,30 @@ public class Louvain {
 
 		while (to_remove.size() > 0) {
 			Node i = to_remove.removeFirst();
-			nodesH.remove(i);
+			H.remove(i);
 		}
 		while (to_remove_edge.size() > 0) {
 			Edge e = to_remove_edge.removeFirst();
 			H.getEdges().remove(e);
 		}
 		return H;
-	}
+	}*/
 
 	/**
 	 * Form the subgraph formed by a community.
-	 * @param community The community from which we get the subgraph.
-	 * @param scale The scale we are working on.
+	 * 
+	 * @param community
+	 *            The community from which we get the subgraph.
+	 * @param scale
+	 *            The scale we are working on.
 	 * @return The newly formed graph.
 	 */
-	public Graph getGraphFromCommunity(String community, int scale) {
-		
+	/*public Graph getGraphFromCommunity(String community, int scale) {
+
 		Graph T = (Graph) G.clone();
 		LinkedList<Edge> edges_to_remove = new LinkedList<Edge>();
-		
+		LinkedList<Node> nodes_to_remove = new LinkedList<Node>();
+
 		String ci, cj;
 		Node i, j;
 		Edge e;
@@ -418,15 +379,26 @@ public class Louvain {
 			j = e.getEndNode();
 			ci = i.getCommunity(scale);
 			cj = j.getCommunity(scale);
-			if(!(ci.compareTo(community) == 0 && cj.compareTo(community) == 0))
+			if (!(ci.compareTo(community) == 0 && cj.compareTo(community) == 0))
 				edges_to_remove.add(e);
 		}
-		
+
+		for (Object o : T) {
+			Node node = (Node) o;
+			if (node.getCommunity(scale).compareTo(community) != 0)
+				nodes_to_remove.add(node);
+		}
+
 		while (edges_to_remove.size() > 0) {
 			e = edges_to_remove.removeFirst();
 			T.getEdges().remove(e);
 		}
-		
+
+		while (nodes_to_remove.size() > 0) {
+			Node n = nodes_to_remove.removeFirst();
+			T.remove(n);
+		}
+
 		return T;
-	}
+	}*/
 }
