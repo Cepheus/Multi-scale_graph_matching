@@ -14,12 +14,32 @@ public class Graph extends LinkedList {
 	private String classId;
 	/** the identifier of the graph */
 	private String id;
+	public int getScaleMax() {
+		return scaleMax;
+	}
+
+	public void setScaleMax(int scaleMax) {
+		this.scaleMax = scaleMax;
+	}
+
 	/** labeled edges: true/false */
 	private String edgeId;
 	/** modes: directed, undirected */
 	private String edgeMode;
 	/** the edges of the graph */
 	private LinkedList edges;
+	/** The scale of the graph. */
+	private int scale = 0;
+	/** The maximum scale of the graph. */
+	private int scaleMax = 0;
+
+	public int getScale() {
+		return scale;
+	}
+
+	public void setScale(int scale) {
+		this.scale = scale;
+	}
 
 	/**
 	 * the constructor
@@ -36,6 +56,8 @@ public class Graph extends LinkedList {
 		H.id = id;
 		H.edgeId = edgeId;
 		H.edgeMode = edgeMode;
+		H.scale = scale;
+		H.scaleMax = scaleMax;
 		Hashtable<String, Node> nodes = new Hashtable<String, Node>();
 		for (Object o : edges) {
 			Edge e = (Edge) ((Edge) o).clone();
@@ -218,7 +240,7 @@ public class Graph extends LinkedList {
 							}
 							community_done.add(ci);
 							community_node.add(i);
-							i.isCommunity(true);
+							i.isCommunity(scale);
 						}
 						// Finally we remove the node j
 						if (!community_node.contains(j))
@@ -236,6 +258,7 @@ public class Graph extends LinkedList {
 			Edge e = to_remove_edge.removeFirst();
 			H.getEdges().remove(e);
 		}
+		H.scale = scale;
 		return H;
 	}
 
@@ -283,6 +306,7 @@ public class Graph extends LinkedList {
 			T.remove(n);
 		}
 
+		T.scale = 0;
 		return T;
 	}
 }

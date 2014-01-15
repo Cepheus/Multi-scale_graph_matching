@@ -34,12 +34,12 @@ public class CommunityCostFunction implements ICostFunction {
 	private String key;
 
 	/**
-	 * The class that is used to get the communities subgraphs.
+	 * The first graph to compare.
 	 */
-	private Louvain louvain;
+	private Graph G1;
 
 	/**
-	 * The graph we will do GED of communities with.
+	 * The second graph to compare.
 	 */
 	private Graph G2;
 
@@ -55,49 +55,66 @@ public class CommunityCostFunction implements ICostFunction {
 	 *            The constant cost of an edge.
 	 * @param key
 	 *            The key of the value to take into account.
-	 * @param louvain
-	 *            The class that is used to get the communities subgraphs.
+	 * @param G1
+	 *            The first graph to compare.
 	 * @param G2
-	 *            The graph we will do GED of communities with.
+	 *            The second graph to compare.
+	 * @param edgehandler
+	 *            The edge handler.
 	 */
 	public CommunityCostFunction(double nodeCost, double edgeCost, String key,
-			Louvain louvain, Graph G2, IEdgeHandler edgehandler) {
+			Graph G1, Graph G2,
+			IEdgeHandler edgehandler) {
 		this.nodeCost = nodeCost;
 		this.edgeCost = edgeCost;
 		this.key = key;
-		this.louvain = louvain;
+		this.G1 = G1;
 		this.G2 = G2;
 		this.edgehandler = edgehandler;
 	}
 
 	@Override
 	public double getCosts(GraphComponent start, GraphComponent end) {
-
-		// Node handling.
+		
+		Graph H1, H2;
+		
 		if (start.isNode() || end.isNode()) {
-			// Start is a community.
-			if (start.isNode() && ((Node) start).isCommunity()) {
-				Node node = (Node) start;
-				louvain.setScale(louvain.getScale()-1);
-				GraphEditDistance GED = new GraphEditDistance(
-						louvain.getGraphFromCommunity(node.getComponentId(),
-								louvain.getScale()), G2, this, edgehandler,
-						false);
+			Node start_node = (Node) start;
+			Node end_node = (Node) end;
+			// G1 and G2 are communities
+			if(start_node.isCommunity() && end_node.isCommunity()) {
+				H1 = G1.getGraphFromCommunity(start_node.getComponentId(), start_node.getScale());
+				H1 = H1.getGraphFromScale(start_node.getScale()-1, key);
+				
+				H2 = G2.getGraphFromCommunity(end_node.getComponentId(), end_node.getScale());
+				H2 = H2.getGraphFromScale(end_node.getScale()-1, key);
+				
+				GraphEditDistance GED = new GraphEditDistance(H1, H2, this, edgehandler, false);
 				return GED.getBestEditpath().getTotalCosts();
 			}
-			// End is a community
-			if (end.isNode() && ((Node) end).isCommunity()) {
-				Node node = (Node) start;
-				louvain.setScale(louvain.getScale()-1);
-				GraphEditDistance GED = new GraphEditDistance(
-						louvain.getGraphFromCommunity(node.getComponentId(),
-								louvain.getScale()), G2, this, edgehandler,
-						false);
+			else if (start_node.isCommunity()) {
+				H1 = G1.getGraphFromCommunity(start_node.getComponentId(), start_node.getScale());
+				H1 = H1.getGraphFromScale(start_node.getScale()-1, key);
+				
+				H2 = new Graph();
+				H2.add(end_node);
+				
+				GraphEditDistance GED = new GraphEditDistance(H1, H2, this, edgehandler, false);
+				return GED.getBestEditpath().getTotalCosts();
+			}
+			else if (end_node.isCommunity()) {
+				H1 = new Graph();
+				H1.add(start_node);
+				
+				H2 = G2.getGraphFromCommunity(end_node.getComponentId(), end_node.getScale());
+				H2 = H2.getGraphFromScale(end_node.getScale()-1, key);
+								
+				GraphEditDistance GED = new GraphEditDistance(H1, H2, this, edgehandler, false);
 				return GED.getBestEditpath().getTotalCosts();
 			}
 			return nodeCost;
 		}
-
+		
 		return edgeCost;
 	}
 

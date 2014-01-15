@@ -21,6 +21,9 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 	
 	/** Is the node a community. */
 	private boolean isCommunity = false;
+	
+	/** The scale of the node. If the node is a community the value will be different from 0. */
+	private int scale = 0;
 
 	public boolean isDirected() {
 		return isDirected;
@@ -29,13 +32,22 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 	public boolean isCommunity() {
 		return isCommunity();
 	}
+	
+	public int getScale() {
+		return scale;
+	}
 
 	public void setDirected(boolean isDirected) {
 		this.isDirected = isDirected;
 	}
 	
-	public void isCommunity(boolean isCommunity) {
-		this.isCommunity = isCommunity;
+	/**
+	 * Declare the node as a community.
+	 * @param scale The scale of the community.
+	 */
+	public void isCommunity(int scale) {
+		this.isCommunity = true;
+		this.scale = scale;
 	}
 
 	public Node() {
@@ -65,6 +77,7 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 		node.setComponentId(getComponentId());
 		node.setNode(isNode());
 		node.setTable(getTable());
+		node.isCommunity(scale);
 		node.communities = new LinkedList<String>();
 		for (String s : communities) {
 			node.communities.add(s);

@@ -24,8 +24,6 @@ public class Louvain {
 
 	/** The original graph */
 	private Graph G;
-	/** The actual graph, modified at each call of findCommunities */
-	private Graph H;
 	/** The key of the attribute of the edges */
 	private String key;
 	/** The scale of graph H */
@@ -89,7 +87,6 @@ public class Louvain {
 		Q = 1 / (2 * m);
 
 		this.G = G;
-		H = (Graph) G.clone();
 	}
 
 	/**
@@ -103,11 +100,8 @@ public class Louvain {
 			Node i = (Node) o;
 			i.addCommunity(scale + 1, i.getCommunity(scale));
 		}
-		for (Object o : H) {
-			Node i = (Node) o;
-			i.addCommunity(scale + 1, i.getCommunity(scale));
-		}
 		scale++;
+		G.setScaleMax(scale);
 
 		String old_community;
 		String current_community;
@@ -147,15 +141,6 @@ public class Louvain {
 		}
 		computeModularity();
 		// } while (old_Q != Q);
-
-		for (Object oi : G) {
-			Node i = (Node) oi;
-			for (Object oj : H) {
-				Node j = (Node) oj;
-				if (i.getId() == j.getId())
-					j.editCommunity(scale, i.getCommunity(scale));
-			}
-		}
 	}
 
 	/**
@@ -179,14 +164,14 @@ public class Louvain {
 			String start = e.getStartNode().getCommunity(scale);
 			String end = e.getEndNode().getCommunity(scale);
 			// Sum of the weights of the links inside the community.
-			if (start == C && start == end)
+			if (start.equals(C) && start.equals(end))
 				sumIn += Double.parseDouble((String) e.getValue(key));
 			// Sum of the weights of the links incident to the community.
-			if (start == C && end != C || start != C && end == C)
+			if (start.equals(C) && !end.equals(C) || !start.equals(C) && end.equals(C))
 				sumTot += Double.parseDouble((String) e.getValue(key));
 			// Sum of the weights of the links from i to nodes in C.
-			if (start == C && e.getEndNode() == i || e.getStartNode() == i
-					&& end == C)
+			if (start.equals(C) && e.getEndNode() == i || e.getStartNode() == i
+					&& end.equals(C))
 				kiin += Double.parseDouble((String) e.getValue(key));
 			// Sum of the weights of the edges attached to vertex i.
 			if (e.getStartNode() == i || e.getEndNode() == i)
@@ -219,7 +204,7 @@ public class Louvain {
 				Node j = (Node) oj;
 				ci = i.getCommunity(scale);
 				cj = j.getCommunity(scale);
-				if (ci == cj && i != j) {
+				if (ci.compareTo(cj) == 0 && i != j) {
 					Aij = Double.MIN_VALUE;
 					ki = kj = 0;
 					for (Object o : G.getEdges()) {

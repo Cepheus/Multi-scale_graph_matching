@@ -28,241 +28,56 @@ import xml.XMLWriter;
 
 /**
  * @author Thomas Noguer
- * 
+ * This class contains all the tools to perform a multi scaled graph edit distance.
  */
 public class MultiScaleGraphEditDistance {
 
-	// classe EditPath:
-	// EditPath(G1,G2).
-	// double cpuUserAvant;
-	// double cpuKernelAvant;
-	// double wctAvant;
-	ArrayList<EditPath> OPEN; // Tiens à jour la liste des noeud non encore
-								// utilisés. Le score du chemin.
-	private Graph G1; // Graph 1
-	private Graph G2; // Graph 2
-	private Node CurNode; // Current node
-	private int G2NbNodes; // Number of nodes of G2
-	public int openCounterSize; // a variable that tracks the maximum size of
-								// the set OPEN
-	public int editPathCounter; // a variable that tracks number of edit paths
-
-	// debug info
-	// debug variable
-	int nbexlporednode = 0;
-	int maxopensize = 0;
-
-	private EditPath BestEditpath; // Zeina: The best answer
+	private Graph G1;
+	private Graph G2;
 	boolean debug;
+	private EditPath bestEditPath;
 
-	// A function that returns the best edit path "i.e. the optimal solution"
-	public EditPath getBestEditpath() {
-		return BestEditpath;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////////////////////
-	public MultiScaleGraphEditDistance(Graph G1, Graph G2,
-			ICostFunction costfunction, IEdgeHandler edgehandler, boolean debug) {
+	/**
+	 * 
+	 * @param G1 The first graph to compare.
+	 * @param G2 The second graph to compare.
+	 * @param key The name of the value to be used in the edges.
+	 * @param edgehandler The edge handler.
+	 * @param debug
+	 */
+	public MultiScaleGraphEditDistance(Graph G1, Graph G2, String key,
+			IEdgeHandler edgehandler, boolean debug) {
 
 		this.debug = debug;
 		this.G1 = G1;
 		this.G2 = G2;
-		G2NbNodes = G2.size(); // Number of nodes of G2
-		BestEditpath = null; // In the beginning, the list is empty.
 
-		// La liste OPEN est initialisée à VIDE. OPEN est une liste de chemin
-		// Zeina: The set open contains the search tree nodes to be processed in
-		// the next steps
-		OPEN = new ArrayList<EditPath>();
+		// Louvain on both G1 and G2
+		Louvain L1 = new Louvain(G1, key);
+		double Q;
+		do {
+			Q = L1.getQ();
+			L1.findCommunities();
+		} while (Q != L1.getQ());
+		Louvain L2 = new Louvain(G2, key);
 
-		// avant la boucle
-		inti();
+		// We find all the communities.
+		do {
+			Q = L2.getQ();
+			L2.findCommunities();
+		} while (Q != L2.getQ());
 
-		BestEditpath = loop();
-	}
+		// We create the cost function with the original graphs.
+		Constants.costFunction = new CommunityCostFunction(1, 1, key, G1, G2,
+				edgehandler);
+		
+		// We put the last scaled graphs for the GED
+		G1 = G1.getGraphFromScale(G1.getScaleMax(), key);
+		G2 = G2.getGraphFromScale(G2.getScaleMax(), key);
 
-	// //////////////////////////////////////////////////////////////////////////////////////////
-	private EditPath loop() {
-
-		while (true) {
-
-			if (OPEN.isEmpty() == true) {
-				System.out
-						.println("Error : No more candidates, no complete solution could be found");
-				System.out.println("Error : Please check your graph data");
-				return null;
-			}
-
-			// On cherche dans OPEN le chemin avec le cout minimum (Pmin) et on
-			// l'enléve de OPEN
-			EditPath pmin = findmincostEditPath(OPEN);
-			OPEN.remove(pmin);
-			if (debug == true) {
-				System.out
-						.println("----------------------------------------------------------");
-				System.out.println("Current Path=");
-				pmin.printMe();
-			}
-
-			if (pmin.isComplete() == true) {
-				return pmin;
-			} else {
-				// K est l'index du noeud de G1 en cours de traintement. Premier
-				// courp, k=1.
-				// Si on a traité k < taille de G1
-
-				if (pmin.getUnUsedNodes1().size() > 0) {
-					;
-					this.CurNode = pmin.getNext();
-					if (debug == true)
-						System.out.println("Current Node="
-								+ this.CurNode.getId());
-
-					// pour tous les noeuds (w) de V2 qui ne sont pas encore
-					// utilisés dans Pmin. on ajoute dans pmin toutes les
-					// substitutions de uk+1 avec w.
-					LinkedList<Node> UnUsedNodes2 = pmin.getUnUsedNodes2();
-					for (int i = 0; i < UnUsedNodes2.size(); i++) {
-						EditPath newpath = new EditPath(pmin);
-
-						Node w = UnUsedNodes2.get(i);
-						newpath.addDistortion(this.CurNode, w);
-
-						if (debug == true) {
-							System.out
-									.println("Substitution CurNode and ith node of G2= "
-											+ this.CurNode.getId()
-											+ " -- "
-											+ w.getId());
-							newpath.printMe();
-						}
-
-						this.OPEN.add(newpath);
-						if (debug == true)
-							TrackOpenEditPathSize();
-
-						if (debug == true)
-							System.out
-									.println("----------------------------------------------------------");
-					}
-					// On met dans pmin une suppresion de uk+1.
-					EditPath newpath = new EditPath(pmin);
-					newpath.addDistortion(this.CurNode, Constants.EPS_COMPONENT);
-
-					if (debug == true) {
-						System.out.println("Deletion CurNode="
-								+ this.CurNode.getId());
-						newpath.printMe();
-						System.out
-								.println("----------------------------------------------------------");
-					}
-
-					this.OPEN.add(newpath);
-					if (debug == true)
-						TrackOpenEditPathSize();
-
-				} else {
-					// Sinon si k= taille de G1
-					// On met dans pmin toutes les insertions des noeuds de V2
-					// qui ne sont pas encore utilisés dans Pmin.
-					// On remet Pmin dans OPEN
-					EditPath newpath = new EditPath(pmin);
-					newpath.complete();
-					this.OPEN.add(newpath);
-					if (debug == true)
-						TrackOpenEditPathSize();
-					if (debug == true) {
-						System.out
-								.println("We complete the path by inserting all remaining nodes of G2 CurNode="
-										+ this.CurNode.getId());
-						newpath.printMe();
-					}
-
-				}// fin si k<(this.G1NbNodes-1)
-			}// fin si chemin optimal
-
-		}// boucle while
-	}
-
-	// A function that returns the minimal edit path's cost in the set OPEN
-	private EditPath findmincostEditPath(ArrayList<EditPath> oPEN2) {
-		// TODO Auto-generated method stub
-		int i = 0;
-		int nbpaths = OPEN.size();
-		double minvalue = Double.MAX_VALUE;
-		int indexmin = -1;
-
-		for (i = 0; i < nbpaths; i++) {
-			EditPath p = OPEN.get(i);
-			if (p.getTotalCosts() < minvalue) {
-				minvalue = p.getTotalCosts();
-				indexmin = i;
-			}
-		}
-
-		this.nbexlporednode++;
-		maxopensize = Math.max(this.OPEN.size(), this.maxopensize);
-		return OPEN.get(indexmin);
-	}
-
-	// the initialization function
-	private void inti() {
-		// TODO Auto-generated method stub
-		for (int i = 0; i < G2NbNodes; i++) {
-			// Dans la liste OPEN on met toutes les substitions de u1 avec tous
-			// les noeuds de g2.
-			// index du noeud courant
-
-			EditPath p = new EditPath(G1, G2); // An intialization for both G1
-												// and G2
-												// "to show that we did not use neither edges nor nodes of both G1 and G2"
-			Node v = (Node) G2.get(i);
-			this.CurNode = p.getNext();
-			/*
-			 * Add distortion between the current node u1 and each node in G2
-			 * distortion means insertion or substitution but not deletion as we
-			 * are sure that G2 has nodes as we are inside the for loop of G2
-			 */
-			p.addDistortion(this.CurNode, v);
-			if (debug == true)
-				System.out
-						.println("Substitution CurNode G1 and ith node of G2= ("
-								+ this.CurNode.getId()
-								+ "  "
-								+ v.getId()
-								+ ")   Cost =" + p.getTotalCosts());
-			OPEN.add(p);
-			if (debug == true)
-				TrackOpenEditPathSize();
-		}
-
-		// On met dans OPEN une suppresion de u1. Dans le cas ou supprimer u1
-		// serait une possibilité optimale.
-		EditPath p = new EditPath(G1, G2);
-		this.CurNode = p.getNext();
-		p.addDistortion(this.CurNode, Constants.EPS_COMPONENT); // Zeina:
-																// deletion
-		if (debug == true)
-			System.out.println("Deletion CurNode=" + this.CurNode.getId()
-					+ " -- Cost = " + p.getTotalCosts());
-		OPEN.add(p);
-		if (debug == true)
-			TrackOpenEditPathSize();
-	}
-
-	// A function that tracks the no of unexamined "added" edit Paths and the
-	// maximum size of the set OPEN
-	private void TrackOpenEditPathSize() {
-		// TODO Auto-generated method stub
-		editPathCounter++;
-		if (openCounterSize < OPEN.size()) {
-			openCounterSize = OPEN.size();
-			if (debug == true) {
-				System.out.println("OPEN max size = " + openCounterSize);
-				System.out.println("No of edit paths = " + editPathCounter);
-
-			}
-		}
+		// GED
+		GraphEditDistance GED = new GraphEditDistance(G1, G2, Constants.costFunction, edgehandler, debug);
+		bestEditPath = GED.getBestEditpath();
 	}
 
 	/**
@@ -298,46 +113,83 @@ public class MultiScaleGraphEditDistance {
 		}
 
 		/** EXECUTION */
-		// Graph G1, G2;
-		// G1 = graphTab[0];
-		// G2 = graphTab[0];
-		// Louvain louvain = new Louvain(G1, "valence");
-		// Constants.costFunction = (ICostFunction) new CommunityCostFunction(1,
-		// 1, "valence", louvain, G2, Constants.edgeHandler);
-		// double Q;
-		// do {
-		// louvain.findCommunities();
-		// Q = louvain.getQ();
-		// } while (Q != louvain.getQ());
-		//
-		// G1 = louvain.getGraphFromScale(louvain.getScale());
-		//
-		// System.out.println("G1");
-		// for (Object o : G1.getEdges()) {
-		// Edge e = (Edge) o;
-		// System.out.println(e.getComponentId());
-		// }
-		//
-		// System.out.println("G2");
-		// for (Object o : G2.getEdges()) {
-		// Edge e = (Edge) o;
-		// System.out.println(e.getComponentId());
-		// }
-		//
-
-		// MultiScaleGraphEditDistance MultiScaleGED = new
-		// MultiScaleGraphEditDistance(
-		// louvain.getGraphFromScale(louvain.getScale()), G2,
-		// Constants.costFunction, Constants.edgeHandler, false);
-		// System.out.println(MultiScaleGED.getBestEditpath().toString());
+//		Graph G1, G2;
+//		G1 = graphTab[0];
+//		G2 = graphTab[0];
+//
+//		MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(
+//				G1, G2, "valence", Constants.edgeHandler, false);
+//		System.out.println(MultiScaleGED.getBestEditpath().getTotalCosts());
 
 		/** TESTS */
 		// Test Louvain
 		Graph G, H;
 		G = graphTab[0];
 		Louvain louvain = new Louvain(G, "valence");
+		System.out.println("Q = " +louvain.getQ());
 		louvain.findCommunities();
+		System.out.println("GRAPH FROM SCALE " + louvain.getScale());
+		H = G.getGraphFromScale(louvain.getScale(), "valence");
+		for (Object o : G) {
+			Node node = (Node) o;
+			System.out.println(node.getComponentId() + " " + node.getCommunity(louvain.getScale()));
+		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId() + " "
+					+ e.getTable().get("valence"));
+		}
+		System.out.println("Q = " +louvain.getQ());
 		louvain.findCommunities();
+		System.out.println("GRAPH FROM SCALE " + louvain.getScale());
+		H = G.getGraphFromScale(louvain.getScale(), "valence");
+		for (Object o : G) {
+			Node node = (Node) o;
+			System.out.println(node.getComponentId() + " " + node.getCommunity(louvain.getScale()));
+		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId() + " "
+					+ e.getTable().get("valence"));
+		}
+		System.out.println("Q = " +louvain.getQ());
+		louvain.findCommunities();
+		System.out.println("GRAPH FROM SCALE " + louvain.getScale());
+		H = G.getGraphFromScale(louvain.getScale(), "valence");
+		for (Object o : G) {
+			Node node = (Node) o;
+			System.out.println(node.getComponentId() + " " + node.getCommunity(louvain.getScale()));
+		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId() + " "
+					+ e.getTable().get("valence"));
+		}
+		System.out.println("Q = " +louvain.getQ());
+		louvain.findCommunities();
+		System.out.println("GRAPH FROM SCALE " + louvain.getScale());
+		H = G.getGraphFromScale(louvain.getScale(), "valence");
+		for (Object o : G) {
+			Node node = (Node) o;
+			System.out.println(node.getComponentId() + " " + node.getCommunity(louvain.getScale()));
+		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId() + " "
+					+ e.getTable().get("valence"));
+		}
+		
+		H = G.getGraphFromScale(G.getScaleMax(), "valence");
+		System.out.println("Graph Scale "+H.getScale());
+		for (Object o : H) {
+			Node node = (Node) o;
+			System.out.println(node.getComponentId() + " " + node.getScale());
+		}
+		for (Object o : H.getEdges()) {
+			Edge e = (Edge) o;
+			System.out.println(e.getComponentId() + " "
+					+ e.getTable().get("valence"));
+		}
 
 		// Test Get graph from community
 		System.out.println("Get c5");
@@ -352,10 +204,10 @@ public class MultiScaleGraphEditDistance {
 		}
 
 		System.out.println("Graph from scale " + louvain.getScale());
-		H = H.getGraphFromScale(louvain.getScale()-1, "valence");
+		H = H.getGraphFromScale(louvain.getScale() - 1, "valence");
 		for (Object o : H) {
 			Node node = (Node) o;
-			System.out.println(node.getComponentId());
+			System.out.println(node.getComponentId() + " " + node.getScale());
 		}
 		for (Object o : H.getEdges()) {
 			Edge e = (Edge) o;
@@ -363,6 +215,10 @@ public class MultiScaleGraphEditDistance {
 					+ e.getTable().get("valence"));
 		}
 
+	}
+
+	private EditPath getBestEditpath() {
+		return bestEditPath;
 	}
 
 	private static FilenameFilter gxlFileFilter = new FilenameFilter() {
