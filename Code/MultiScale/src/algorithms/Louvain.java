@@ -46,6 +46,10 @@ public class Louvain {
 	public int getScale() {
 		return scale;
 	}
+	
+	public void setScale(int scale) {
+		this.scale = scale;
+	}
 
 	public double getQ() {
 		return Q;
@@ -373,6 +377,7 @@ public class Louvain {
 							}
 							community_done.add(ci);
 							community_node.add(i);
+							i.isCommunity(true);
 						}
 						// Finally we remove the node j
 						if (!community_node.contains(j))

@@ -16,16 +16,26 @@ public class Node extends GraphComponent implements  java.io.Serializable{
 	private LinkedList<String> communities;
 
 
-
 	/** modes: directed, undirected */
 	private boolean isDirected=false;
+	
+	/** Is the node a community. */
+	private boolean isCommunity = false;
 
 	public boolean isDirected() {
 		return isDirected;
 	}
+	
+	public boolean isCommunity() {
+		return isCommunity();
+	}
 
 	public void setDirected(boolean isDirected) {
 		this.isDirected = isDirected;
+	}
+	
+	public void isCommunity(boolean isCommunity) {
+		this.isCommunity = isCommunity;
 	}
 
 	public Node() {
