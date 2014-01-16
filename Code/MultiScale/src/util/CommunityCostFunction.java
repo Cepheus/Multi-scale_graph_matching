@@ -110,6 +110,21 @@ public class CommunityCostFunction implements ICostFunction {
 		}
 		if (start.isNode() || end.isNode()) {
 			if (start.getComponentId().equals(Constants.EPS_ID) || end.getComponentId().equals(Constants.EPS_ID)) {
+				if (start.getComponentId().equals(Constants.EPS_ID) && ((Node)end).isCommunity() ) {
+					Node end_node = (Node) end;
+					H2 = G2.getGraphFromCommunity(end_node.getComponentId(),
+							end_node.getScale());
+					H2 = H2.getGraphFromScale(end_node.getScale() - 1, key);
+					return H2.size() * nodeCost + H2.getEdges().size() * edgeCost;
+				}
+				else if(end.getComponentId().equals(Constants.EPS_ID) && ((Node)start).isCommunity()) {
+					Node start_node = (Node) start;
+					H1 = G1.getGraphFromCommunity(start_node.getComponentId(),
+							start_node.getScale());
+					H1 = H1.getGraphFromScale(start_node.getScale() - 1, key);
+
+					return H1.size() * nodeCost + H1.getEdges().size() * edgeCost;
+				}
 				return nodeCost;
 			}					
 		}
