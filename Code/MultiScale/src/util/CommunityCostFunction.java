@@ -75,7 +75,7 @@ public class CommunityCostFunction implements ICostFunction {
 
 	@Override
 	public double getCosts(GraphComponent start, GraphComponent end) {
-
+		
 		Graph H1, H2;
 		if (start.isNode() && end.isNode()) {
 			Node start_node = (Node) start;
@@ -98,18 +98,28 @@ public class CommunityCostFunction implements ICostFunction {
 						start_node.getScale());
 				H1 = H1.getGraphFromScale(start_node.getScale() - 1, key);
 
-				return H1.size() * nodeCost + H1.getEdges().size() * edgeCost;
+				return (H1.size()-1) * nodeCost + H1.getEdges().size() * edgeCost;
 			} else if (end_node.isCommunity()) {
 				H2 = G2.getGraphFromCommunity(end_node.getComponentId(),
 						end_node.getScale());
 				H2 = H2.getGraphFromScale(end_node.getScale() - 1, key);
 
-				return H2.size() * nodeCost + H2.getEdges().size() * edgeCost;
+				return (H2.size()-1) * nodeCost + H2.getEdges().size() * edgeCost;
 			}
-			return nodeCost;
+			return 0.0;
+		}
+		if (start.isNode() || end.isNode()) {
+			if (start.getComponentId().equals(Constants.EPS_ID) || end.getComponentId().equals(Constants.EPS_ID)) {
+				return nodeCost;
+			}					
+		}
+		else {
+			if (start.getComponentId().equals(Constants.EPS_ID) || end.getComponentId().equals(Constants.EPS_ID)) {
+				return this.edgeCost;
+			}
 		}
 
-		return edgeCost;
+		return 0.0;
 	}
 
 	@Override
