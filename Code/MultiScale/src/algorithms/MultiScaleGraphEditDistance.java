@@ -128,20 +128,22 @@ public class MultiScaleGraphEditDistance {
 			for (int j = i; j < nbGraphs; j++) {
 				G2 = graphTab[j];
 				System.out.println(i + " " + j + " on " + nbGraphs);
-
+				
+				if (i == 22 && j == 372)
+					System.in.read();
 				output.write(G1.getId() + ";" + G2.getId());
 				SET.StartChrono();
 				
-//				Constants.costFunction = (ICostFunction) new UnlabeledCostFunction(
-//						1, 1, 1);
-//				GraphEditDistance GED = new GraphEditDistance(G1, G2,
-//						Constants.costFunction, Constants.edgeHandler, false);
-//				output.write(";" + GED.getBestEditpath().getTotalCosts());
+				Constants.costFunction = (ICostFunction) new UnlabeledCostFunction(
+						1, 1, 1);
+				GraphEditDistance GED = new GraphEditDistance(G1, G2,
+						Constants.costFunction, Constants.edgeHandler, false);
+				output.write(";" + GED.getBestEditpath().getTotalCosts());
 
-				MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(
-						G1, G2, "distance", Constants.edgeHandler, false);
-				output.write(";"
-						+ MultiScaleGED.getBestEditpath().getTotalCosts());
+//				MultiScaleGraphEditDistance MultiScaleGED = new MultiScaleGraphEditDistance(
+//						G1, G2, "distance", Constants.edgeHandler, false);
+//				output.write(";"
+//						+ MultiScaleGED.getBestEditpath().getTotalCosts());
 				
 				SET.StopChrono();
 				output.write(";" + SET.ElapsedTimeToString());

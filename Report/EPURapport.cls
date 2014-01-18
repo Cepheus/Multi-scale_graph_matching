@@ -387,9 +387,9 @@
 	\renewcommand{\thepage}{\Roman{page}}
 	
 	% Affichage des tables et listes habituelles
-%	\tableofcontents
-%	\listoffigures
-%	\listoftables
+	\tableofcontents
+	\listoffigures
+	\listoftables
 %	% Et des non habituelles
 %	\ifthenelse{\isundefined{\extratables}}
 %	{}{\extratables}

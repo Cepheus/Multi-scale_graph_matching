@@ -24,17 +24,25 @@
 
 \begin{document}
 
-\chapter{Formalization of the problem}
+\chapter{Introduction}
 
 	\hspace{4ex}When we wish to do the comparison of two graphs, we can come to a limitation when handling high sized graphs. The community detection algorithms allow to simplify a graph by finding communities of highly related nodes. It is then legitimate to want to use such algorithm to reduce the size of graphs in order to perform calculations that are greedy for computation time.
 	
 	For this project we choose to use a community detection algorithm for graph comparison. The Louvain's method is very fast and easy to implement. The graph edit distance method is known to be very slow when dealing with high scaled graphs. In this project we want to use the community detection to simplify the graphs to be used in the graph edit distance so we can still compare them with a good computation time.
 	
-	There is still an issue to solve, how do we use one method with the other. The Louvain's method can be used in several iterations to make the graph more and more simple. We must find a relation between the edit distance between two graphs at different scales and the edit distance between the unchanged graphs. At which scale do we decide that the edit distance is close enough to our original graph? Can we use the different scales together in order to be closer to the distance between the origal graphs? These questions are at the center of our problem.
+	There is still an issue to solve, how do we use one method with the other. The Louvain's method can be used in several iterations to make the graph more and more simple. We must find a relation between the edit distance of two graphs at different scales and the edit distance between the unchanged graphs. At which scale do we decide that the edit distance is close enough to our original graph? Can we use the different scales together in order to be closer to the distance between the original graphs? These questions are at the center of our problem.
+\\
+
+	The rest of the report features the explanation of the graph edit distance and Louvain's method, the elaboration of the multi-scale graph comparison, the results of the project, the perspectives for the future of the project and finally the assessment of this project in regard of my scholarship.
 	
 \chapter{Graph Edit Distance}
+\label{GED}
 
-	\hspace{4ex}We use the following algorithm in order to find the edit distance between two graphs $G1$ and $G2$:
+	\hspace{4ex}One way to compare two graphs is to use their edit distance. The amount of addition/suppression we must perform to transform a graph G1 into a graph G2. If G1 and G2 are equal their edit distance will be 0, if G1 and G2 are infinitely different from each other their edit distance will be close to infinity.
+	
+	This method can be very greedy for computation time if the graphs are big, we usually use approach of this value for such graphs. This is what we will try to perform here, find a evaluation of the edit distance that is easier to find.
+
+	We use the following algorithm in order to find the edit distance between two graphs $G1$ and $G2$:
 	
 \begin{algorithm}
   \caption{Graph Edit Distance}
@@ -55,7 +63,7 @@
 
 \chapter{Community detection: Louvain's method}
 
-	\hspace{4ex}This method is based on two formulas: the modularity $Q$ and the composite modularity gain $\Delta Q$. The modularity of a graph is found following this formula:
+	\hspace{4ex}The community detection is used to find communities of highly correlated nodes within a graph. This method is based on two formulas: the modularity $Q$ and the composite modularity gain $\Delta Q$. The modularity of a graph is found following this formula:
 \\
 
 \[
@@ -79,7 +87,7 @@ Q = \frac{1}{2m}\underset{i,j}{\sum}\left[A_{ij} - \frac{k_ik_j}{2m}\right] \del
 
 
 \begin{algorithm}
-  \caption{Louvain's method}
+  \caption{Louvain}
   \begin{algorithmic}[1]
       \State Assign each node to a unique community.
       \State Compute the initial modularity.
@@ -99,13 +107,68 @@ Q = \frac{1}{2m}\underset{i,j}{\sum}\left[A_{ij} - \frac{k_ik_j}{2m}\right] \del
   \end{algorithmic}
 \end{algorithm}
 
+	Our interest in this method here is that it allows us to subdivide our graph into smaller parts that are highly correlated. It will allow us to transform our graphs to make them simpler.
+
 \chapter{Multi-scale graph comparision}
+
+	\hspace{4ex}The main questions remain, how do we use those methods together in order to have a good comparison of graphs? Several approach are possible, do the edit distance at each scale of our graphs and make an average of all the distances. The problem with the majority of the methods we can think about is that they depend on an arbitrary value. What we would like to have is a method that does not depend on a parameter. The method that allow us to do this is to use the classic graph edit distance algorithm on the most simplified graphs by Louvain's method, only that the cost of addition/suppression of a community is equal to its graph edit distance. We have a recursive model that does not depend on the value of a parameter.
 	
-	\hspace{4ex}We want to compare two graphs G1 and G2. We first use the Louvain's method on G1 until the graph isn't simplified (it is a unique node), we have stored the communities at each scale of the nodes. We then apply the GED algorithm between the most simplified version of G1 and G2, only when we will evaluate the cost of deletion/substitution of a community (i.e. a node that isn't a node in the original graph G1) we will use the GED of the subgraph of this community and G2.
+	\hspace{4ex}We want to compare two graphs G1 and G2. We first use Louvain's method on both graphs until their modularity is not improving, we store the communities of each node at any scale. We then apply the GED algorithm between the most simplified version of both graphs, only when we will evaluate the cost of addition/deletion/substitution of a community (i.e. a node that isn't a node in the original graph G1) we will use the GED of the sub-graph of this community.
 	
-	In other words, the algorithm will compare every community (which are sub-graphs) with G2. We hope that this approach will reduce the computation time of the total distance. 
+	In other words, the algorithm will subdivide the calculation of the GED between smaller calculation of GED of parts of our graphs. We hope that this approach will reduce the computation time of the total distance without damaging too much the value of the distance. 
 \\
 
-	The algorithm is the same as the Graph Edit Distance, this only difference is the cost function which is $GED(GetSubGraph(c),G2)$ where $c$ is a community and the function $GetSubGraph(c)$ returns the sub-graph of the community c. 
+\begin{algorithm}
+	\caption{Multi-scale graph edit distance}
+	\begin{algorithmic}[1]
+		\State // The cost function takes the original graphs and the cost of addition/suppresion for a node and an edge.
+		\State Cost $\gets$ CommunityCostFunction(G1, G2, 1, 1)
+		\State // G1 is transformed into its simpler version by Louvain's method.
+		\State Louvain(G1)
+		\State // G2 is transformed into its simpler version by Louvain's method.
+		\State Louvain(G1)
+		\State // We call the graph edit distance with the simplified version of our graphs and with the special cost function.
+		\State \Return GraphEditDistance(G1,G2, Cost)
+	\end{algorithmic}
+\end{algorithm}
+
+	The community cost function is the following: let us consider two nodes $s$ and $e$, we want to get the cost of addition/suppression of these two nodes only that a node can be a community. We use this cost $GED(GetSubGraph(s),GetSubGraph(e))$ where the function $GetSubGraph(c)$ returns the sub-graph on the community $c$ at the previous scale, or $c$ if $c$ is a node.
+	
+\chapter{Results}
+
+	\hspace{4ex}In order to see the efficiency of our method we chose to compare it with the classic graph edit distance on a set of small graphs (between 5 to 10 nodes). We performed 9560 comparison of different graphs with both GED and multi-scale GED.
+	
+\begin{table}[!h]
+\centering
+\setlength{\extrarowheight}{1.5pt}
+\begin{tabular}{|c|c|c|c|} 
+\hline
+\multicolumn{2}{|c|}{GED} &  \multicolumn{2}{c|}{Multi-Scale GED}\\
+\hline
+Cost & Time(ms) & Cost & Time(ms)\\
+\hline
+1.10 & 324.63 & 2.17 & 8.85\\
+\hline
+\end{tabular}
+\caption{\label{tab:Heuristics}Average results for GED and Multi-Scale GED}
+\end{table}
+
+\begin{figure} [h]
+	\centering \includegraphics{images/GEDvsMultiScalePlot.png}
+	\caption {The linear functions of the costs.}	
+	\label {costplot}
+\end{figure}
+
+\begin{figure} [h]
+	\centering \includegraphics[width=18cm]{images/GEDvsMultiScaleTimePlot.png}
+	\caption {The linear functions of the times.}	
+	\label {timeplot}
+\end{figure}
+
+\chapter{Perspectives}
+
+\chapter{Assessment}
+
+\chapter{Conclusion}
 	
 \end{document}
