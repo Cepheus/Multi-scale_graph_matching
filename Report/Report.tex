@@ -19,8 +19,8 @@
 	\details{Université François-Rabelais, Tours}
 }
 
-\abstracts{abstract}
-{keywords}
+\abstracts{This document presents a method to perform multi-scale graph matching using Louvain's method and the graph edit distance. Results between the classic graph edit distance and this new method are part of this report.}
+{Graph matching, community detection, graph edit distance, multi-scale}
 
 \begin{document}
 
@@ -35,7 +35,7 @@
 
 	The rest of the report features the explanation of the graph edit distance and Louvain's method, the elaboration of the multi-scale graph comparison, the results of the project, the perspectives for the future of the project and finally the assessment of this project in regard of my scholarship.
 	
-\chapter{Graph Edit Distance}
+\chapter{Graph Edit Distance (GED)}
 \label{GED}
 
 	\hspace{4ex}One way to compare two graphs is to use their edit distance. The amount of addition/suppression we must perform to transform a graph G1 into a graph G2. If G1 and G2 are equal their edit distance will be 0, if G1 and G2 are infinitely different from each other their edit distance will be close to infinity.
@@ -138,6 +138,12 @@ Q = \frac{1}{2m}\underset{i,j}{\sum}\left[A_{ij} - \frac{k_ik_j}{2m}\right] \del
 
 	\hspace{4ex}In order to see the efficiency of our method we chose to compare it with the classic graph edit distance on a set of small graphs (between 5 to 10 nodes). We performed 9560 comparison of different graphs with both GED and multi-scale GED.
 	
+	We can observe in the table \ref{tab:averageResults} that the multi-scale GED is very close to the GED and that its time is far superior in average. From this result we can affirm that the multi-scale GED is a very good estimator of the GED.
+	
+	The figure \ref{costplot} shows the linear regression of the costs found during the tests. We can notice that the cost of the multi-scale GED is getting closer as the tests progress. It might be because of the size of the graphs that is increasing as the tests progress.
+	
+	The figure \ref{timeplot} shows the linear regression of the times of execution for our two methods. We can spot the huge difference between the execution time of the GED and multi-scale GED.
+	
 \begin{table}[!h]
 \centering
 \setlength{\extrarowheight}{1.5pt}
@@ -150,7 +156,7 @@ Cost & Time(ms) & Cost & Time(ms)\\
 1.10 & 324.63 & 2.17 & 8.85\\
 \hline
 \end{tabular}
-\caption{\label{tab:Heuristics}Average results for GED and Multi-Scale GED}
+\caption{\label{tab:averageResults}Average results for GED and Multi-Scale GED}
 \end{table}
 
 \begin{figure} [h]
@@ -161,14 +167,20 @@ Cost & Time(ms) & Cost & Time(ms)\\
 
 \begin{figure} [h]
 	\centering \includegraphics[width=18cm]{images/GEDvsMultiScaleTimePlot.png}
-	\caption {The linear functions of the times.}	
+	\caption {The linear functions of the times.}
 	\label {timeplot}
 \end{figure}
 
 \chapter{Perspectives}
 
+	\hspace{4ex}This project was a first attempt at such a method, much is still to be done. The results are very good a show the multi-scale graph edit distance as a very good estimator of the edit distance. The most important thing to do is to test this method with graphs of higher size and shapes. Also there seem to still be a bug in the implementation of the method which must be fixed. In a distant future, the method could be used as a upper bound in a branch and bound algorithm or as an approach distance. The project holds publication material that needs to be exploited.
+
 \chapter{Assessment}
 
+	\hspace{4ex}This project was fulfilling as I had never worked on such topics with such methods. The main difficulty has been to seize the existing code. This code has been a great help as I had only to implement Louvain's method and adapt the already existing GED, but the recursive approach was not easy to implement. The given time for this project was short which explains why we have not done further testing on this new method.
+
 \chapter{Conclusion}
+
+	\hspace{4ex}I wish that my work will help further projects and publication, I did my best to make it accessible to future colleges. I would like to conclude by thanking Romain Raveaux for its presence and support during this project.
 	
 \end{document}
