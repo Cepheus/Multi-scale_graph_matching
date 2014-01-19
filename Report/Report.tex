@@ -28,7 +28,7 @@
 
 	\hspace{4ex}When we wish to do the comparison of two graphs, we can come to a limitation when handling high sized graphs. The community detection algorithms allow to simplify a graph by finding communities of highly related nodes. It is then legitimate to want to use such algorithm to reduce the size of graphs in order to perform calculations that are greedy for computation time.
 	
-	For this project we choose to use a community detection algorithm for graph comparison. The Louvain's method is very fast and easy to implement. The graph edit distance method is known to be very slow when dealing with high scaled graphs. In this project we want to use the community detection to simplify the graphs to be used in the graph edit distance so we can still compare them with a good computation time.
+	For this project we chose to use a community detection algorithm for graph comparison. The Louvain's method is very fast and easy to implement. The graph edit distance method is known to be very slow when dealing with high scaled graphs. In this project we want to use the community detection to simplify the graphs to be used in the graph edit distance so we can still compare them with a good computation time.
 	
 	There is still an issue to solve, how do we use one method with the other. The Louvain's method can be used in several iterations to make the graph more and more simple. We must find a relation between the edit distance of two graphs at different scales and the edit distance between the unchanged graphs. At which scale do we decide that the edit distance is close enough to our original graph? Can we use the different scales together in order to be closer to the distance between the original graphs? These questions are at the center of our problem.
 \\
@@ -113,7 +113,7 @@ Q = \frac{1}{2m}\underset{i,j}{\sum}\left[A_{ij} - \frac{k_ik_j}{2m}\right] \del
 
 	\hspace{4ex}The main questions remain, how do we use those methods together in order to have a good comparison of graphs? Several approach are possible, do the edit distance at each scale of our graphs and make an average of all the distances. The problem with the majority of the methods we can think about is that they depend on an arbitrary value. What we would like to have is a method that does not depend on a parameter. The method that allow us to do this is to use the classic graph edit distance algorithm on the most simplified graphs by Louvain's method, only that the cost of addition/suppression of a community is equal to its graph edit distance. We have a recursive model that does not depend on the value of a parameter.
 	
-	\hspace{4ex}We want to compare two graphs G1 and G2. We first use Louvain's method on both graphs until their modularity is not improving, we store the communities of each node at any scale. We then apply the GED algorithm between the most simplified version of both graphs, only when we will evaluate the cost of addition/deletion/substitution of a community (i.e. a node that isn't a node in the original graph G1) we will use the GED of the sub-graph of this community.
+	\hspace{4ex}We want to compare two graphs G1 and G2. We first use Louvain's method on both graphs until their modularity is not improving, we store the communities of each node at any scale. We then apply the GED algorithm between the most simplified version of both graphs, only when we will evaluate the cost of addition/deletion/substitution of a community (i.e. a node that isn't a node in the original graph G1) we will use the GED of the sub-graph of this community at the previous scale.
 	
 	In other words, the algorithm will subdivide the calculation of the GED between smaller calculation of GED of parts of our graphs. We hope that this approach will reduce the computation time of the total distance without damaging too much the value of the distance. 
 \\
@@ -136,13 +136,13 @@ Q = \frac{1}{2m}\underset{i,j}{\sum}\left[A_{ij} - \frac{k_ik_j}{2m}\right] \del
 	
 \chapter{Results}
 
-	\hspace{4ex}In order to see the efficiency of our method we chose to compare it with the classic graph edit distance on a set of small graphs (between 5 to 10 nodes). We performed 9560 comparison of different graphs with both GED and multi-scale GED.
+	\hspace{4ex}In order to see the efficiency of our method we chose to compare it with the classic graph edit distance on a set of small graphs (between 5 to 10 nodes). We performed 9560 comparisons of different graphs with both GED and multi-scale GED.
 	
 	We can observe in the table \ref{tab:averageResults} that the multi-scale GED is very close to the GED and that its time is far superior in average. From this result we can affirm that the multi-scale GED is a very good estimator of the GED.
 	
 	The figure \ref{costplot} shows the linear regression of the costs found during the tests. We can notice that the cost of the multi-scale GED is getting closer as the tests progress. It might be because of the size of the graphs that is increasing as the tests progress.
 	
-	The figure \ref{timeplot} shows the linear regression of the times of execution for our two methods. We can spot the huge difference between the execution time of the GED and multi-scale GED.
+	The figure \ref{timeplot} shows the linear regression of the execution times for our two methods. We can spot the huge difference between the execution time of the GED and multi-scale GED.
 	
 \begin{table}[!h]
 \centering
@@ -173,14 +173,24 @@ Cost & Time(ms) & Cost & Time(ms)\\
 
 \chapter{Perspectives}
 
-	\hspace{4ex}This project was a first attempt at such a method, much is still to be done. The results are very good a show the multi-scale graph edit distance as a very good estimator of the edit distance. The most important thing to do is to test this method with graphs of higher size and shapes. Also there seem to still be a bug in the implementation of the method which must be fixed. In a distant future, the method could be used as a upper bound in a branch and bound algorithm or as an approach distance. The project holds publication material that needs to be exploited.
+	\hspace{4ex}This project was a first attempt at such a method, much is still to be done. The results are very good and show that the multi-scale graph edit distance is a very good estimator of the edit distance. The most important thing to do is to test this method with graphs of higher size and shapes. Also there seem to still be a bug in the implementation of the method which must be fixed. In a distant future, the method could be used as a upper bound in a branch and bound algorithm or as an approach distance. The project holds publication material that needs to be exploited.
 
 \chapter{Assessment}
 
-	\hspace{4ex}This project was fulfilling as I had never worked on such topics with such methods. The main difficulty has been to seize the existing code. This code has been a great help as I had only to implement Louvain's method and adapt the already existing GED, but the recursive approach was not easy to implement. The given time for this project was short which explains why we have not done further testing on this new method.
+	\hspace{4ex}This project was fulfilling as I had never worked on such topics with such methods. The main difficulty has been to master the existing code to be able to add the needed changes. Although this code has been a great help as I had only to implement Louvain's method and adapt the already existing GED, but the recursive approach was not easy to achieve. The given time for this project was short which explains why we have not done further testing on this new method.
 
 \chapter{Conclusion}
 
-	\hspace{4ex}I wish that my work will help further projects and publication, I did my best to make it accessible to future colleges. I would like to conclude by thanking Romain Raveaux for its presence and support during this project.
+	\hspace{4ex}I hope that my work will help further projects and publication, I did my best to make it accessible to future colleges. I would like to conclude by thanking Romain Raveaux for its presence and support during this project.
+
+\begin{thebibliography}{99}	
+	
+\bibitem{BGLL08}
+{\sc Vincent D. Blondel, Jean-Loup Guillaume, Renaud Lambiotte, Etienne Lefebvre}
+{\ "Fast unfolding of communities in large networks"}.
+{ \textit{Journal of Statistical Mechanics: Theory and Experiment}, 2008}.
+
+\end{thebibliography}
+
 	
 \end{document}
